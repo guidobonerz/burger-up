@@ -11,6 +11,11 @@ GAME_DEATHMATCH     = %01001011
 GAME_ZIRKELTRAINING = %01001100
 GAME_DRIVE_ME_NUTS  = %01001101
 
+FC_COLOR      = $d020
+BG_COLOR      = $d021
+COLOR_RAM     = $d800
+USERPORT_DATA = $dd01
+USERPORT_DDR  = $dd03
 
 GRAP_FCFS = 0
 GRAP_AWAL = 1
@@ -140,6 +145,13 @@ burger_colors:
 !byte $09,$09,$09,$09,$09,$09 ; patty
 !byte $08,$08,$08,$08,$08,$08 ; buttom bun
 !byte $01,$01,$01,$01,$01,$01 ; plate
-start:
 
+init:
+  lda #$00
+  sta FC_COLOR
+  sta BG_COLOR
+  
+  
+start:
+  
 rts
