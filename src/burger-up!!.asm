@@ -123,6 +123,23 @@ player4SelectedBurger:
 player4LayerCount:
   !byte 6,6,6,6
 
+burger_chars:  
+!byte $e9,$a7,$a7,$a7,$a7,$df ; top bun
+!byte $66,$66,$66,$66,$66,$66 ; salad
+!byte $62,$62,$62,$62,$62,$62 ; ketchup/cucumber
+!byte $62,$62,$62,$62,$62,$62 ; cheese
+!byte $66,$66,$66,$66,$66,$66 ; patty
+!byte $5f,$a0,$a0,$a0,$a0,$69 ; bottom bun
+!byte $77,$78,$78,$78,$78,$77 ; plate
+
+burger_colors:
+!byte $08,$08,$08,$08,$08,$08 ; top bun 
+!byte $05,$0d,$05,$0d,$05,$0d ; salad
+!byte $02,$0a,$02,$05,$0d,$05 ; ketchup/cucumber
+!byte $07,$07,$07,$07,$07,$08 ; cheese
+!byte $09,$09,$09,$09,$09,$09 ; patty
+!byte $08,$08,$08,$08,$08,$08 ; buttom bun
+!byte $01,$01,$01,$01,$01,$01 ; plate
 start:
 
 rts
