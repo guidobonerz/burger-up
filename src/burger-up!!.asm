@@ -76,9 +76,9 @@ player1:
 player1Score:
   !word 0
 player1Complete:
-  !word 0
+  !byte 0
 player1Mistakes:
-  !word 0
+  !byte 0
 player1SelectedBurger:
   !byte 0
 player1LayerCount:
@@ -89,9 +89,9 @@ player2:
 player2Score:
   !word 0
 player2Complete:
-  !word 0
+  !byte 0
 player2Mistakes:
-  !word 0
+  !byte 0
 player2SelectedBurger:
   !byte 0
 player2LayerCount:
@@ -102,9 +102,9 @@ player3:
 player3Score:
   !word 0
 player3Complete:
-  !word 0
+  !byte 0
 player3Mistakes:
-  !word 0
+  !byte 0
 player3SelectedBurger:
   !byte 0
 player3LayerCount:
@@ -115,9 +115,9 @@ player4:
 player4Score:
   !word 0
 player4Complete:
-  !word 0
+  !byte 0
 player4Mistakes:
-  !word 0
+  !byte 0
 player4SelectedBurger:
   !byte 0
 player4LayerCount:
