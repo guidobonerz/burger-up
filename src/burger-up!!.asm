@@ -34,25 +34,25 @@ grapModeNames:
 highScorePointerList:
   !byte 0,1,2,3,4,5,6,7,8,9
 highScoreTable:
-  !text "AAA       ",0
+  !text "AAA           ",0
   !word 10
-  !text "BBB       ",0
+  !text "BBB          ",0
   !word 9
-  !text "CCC       ",0
+  !text "CCC          ",0
   !word 8
-  !text "DDD       ",0
+  !text "DDD          ",0
   !word 7
-  !text "EEE       ",0
+  !text "EEE          ",0
   !word 6
-  !text "FFF       ",0
+  !text "FFF          ",0
   !word 5
-  !text "GGG       ",0
+  !text "GGG          ",0
   !word 4
-  !text "HHH       ",0
+  !text "HHH          ",0
   !word 3
-  !text "III       ",0
+  !text "III          ",0
   !word 2
-  !text "JJJ       ",0
+  !text "JJJ          ",0
   !word 1
 
 ingridientSwapTime:
@@ -72,7 +72,7 @@ playerGrapFlag:
 playerPointerList:
   !word player1,player2,player3,player4
 player1:
-  !text "PLAYER1   ",0
+  !text "CHARLY CHEESE",0
 player1Score:
   !word 0
 player1Complete:
@@ -85,7 +85,7 @@ player1LayerCount:
   !byte 6,6,6,6
 
 player2:
-  !text "PLAYER2   ",0
+  !text "PATTY PAT    ",0
 player2Score:
   !word 0
 player2Complete:
@@ -98,7 +98,7 @@ player2LayerCount:
   !byte 6,6,6,6
 
 player3:
-  !text "PLAYER3   ",0
+  !text "BEEF BOB     ",0
 player3Score:
   !word 0
 player3Complete:
@@ -111,7 +111,7 @@ player3LayerCount:
   !byte 6,6,6,6
 
 player4:
-  !text "PLAYER4   ",0
+  !text "TOMATO TAM   ",0
 player4Score:
   !word 0
 player4Complete:
