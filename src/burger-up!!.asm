@@ -156,10 +156,10 @@ burgerStyle3: ; bacon
 burgerStyle4: ; vegan
   !byte 9,8,7,6,2,1,0,$ff
 burgerNames:
-  !text "HAMBURGER                   "
-  !text "CHEESEBURGER                "
-  !text "BACON CHEESEBURGER          "
-  !text "VEGAN GUACAMOLE BURGER      "
+  !text "HAMBURGER             "
+  !text "CHEESEBURGER          "
+  !text "BACON CHEESEBURGER    "
+  !text "VEGAN GUACAMOLE BURGER"
   
 burger_chars:  
 !byte $e9,$a7,$a7,$a7,$a7,$df ; 9 top bun
