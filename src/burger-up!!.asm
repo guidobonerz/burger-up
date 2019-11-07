@@ -159,7 +159,7 @@ character4:
 character5:
 !text "ONION OLLI   ",0
 character6:
-!text "CRUNCH CHRIS ",0
+!text "CRUNCHY CHRIS",0
 character7:
 !text "SALTY SALLY  ",0
 character8:
