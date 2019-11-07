@@ -141,23 +141,36 @@ player4SelectedBurger:
 player4IngridentCount:
   !byte 6,6,6,6
 
+burgerStyle1: ; default
+  !byte 9,8,7,4,3,1,0
+burgerStyle2: ; bacon
+  !byte 9,8,7,5,4,3,1,0
+burgerStyle3: ; vegan
+  !byte 9,8,7,6,2,1,0
+  
 burger_chars:  
-!byte $e9,$a7,$a7,$a7,$a7,$df ; top bun
-!byte $66,$66,$66,$66,$66,$66 ; salad
-!byte $62,$62,$62,$62,$62,$62 ; ketchup/cucumber
-!byte $62,$62,$62,$62,$62,$62 ; cheese
-!byte $66,$66,$66,$66,$66,$66 ; patty
-!byte $5f,$a0,$a0,$a0,$a0,$69 ; bottom bun
-!byte $77,$78,$78,$78,$78,$77 ; plate
+!byte $e9,$a7,$a7,$a7,$a7,$df ; 9 top bun
+!byte $66,$66,$66,$66,$66,$66 ; 8 salad
+!byte $62,$62,$62,$62,$62,$62 ; 7 ketchup/cucumber
+!byte                         ; 6 guacamole
+!byte                         ; 5 bacon
+!byte $62,$62,$62,$62,$62,$62 ; 4 cheese
+!byte $66,$66,$66,$66,$66,$66 ; 3 beef patty
+!byte $66,$66,$66,$66,$66,$66 ; 2 vegan patty
+!byte $5f,$a0,$a0,$a0,$a0,$69 ; 1 bottom bun
+!byte $77,$78,$78,$78,$78,$77 ; 0 plate
 
 burger_colors:
-!byte $08,$08,$08,$08,$08,$08 ; top bun 
-!byte $05,$0d,$05,$0d,$05,$0d ; salad
-!byte $02,$0a,$02,$05,$0d,$05 ; ketchup/cucumber
-!byte $07,$07,$07,$07,$07,$08 ; cheese
-!byte $09,$09,$09,$09,$09,$09 ; patty
-!byte $08,$08,$08,$08,$08,$08 ; buttom bun
-!byte $01,$01,$01,$01,$01,$01 ; plate
+!byte $08,$08,$08,$08,$08,$08 ; 9 top bun 
+!byte $05,$0d,$05,$0d,$05,$0d ; 8 salad
+!byte $02,$0a,$02,$05,$0d,$05 ; 7 ketchup/cucumber
+!byte                         ; 6 guacamole
+!byte                         ; 5 bacon
+!byte $07,$07,$07,$07,$07,$08 ; 4 cheese
+!byte $09,$09,$09,$09,$09,$09 ; 3 beef patty
+!byte $09,$09,$09,$09,$09,$09 ; 2 vegan patty
+!byte $08,$08,$08,$08,$08,$08 ; 1 buttom bun
+!byte $01,$01,$01,$01,$01,$01 ; 0 plate
 
 character1:
 !text "CHARLY CHEESE",0
@@ -175,6 +188,10 @@ character7:
 !text "SALTY SALLY  ",0
 character8:
 !text "CHILI CHASE  ",0
+character9:
+!text "BACON BENNY  ",0
+character10:
+!text "VEGAN VIVIAN ",0
 
 init:
   lda #$00
