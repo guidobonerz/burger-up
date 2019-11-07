@@ -1,17 +1,28 @@
 *=$c000
 
 
-;B : BURGERS 0=1 / 1=2 / 2=4
-;M : 1=MULTIPLAYER / 0=SINGLEPLAYER
-;G : GAMETYPE 1=GAME_SINGLE, 2=GAME_COMPETITION, 3=GAME_DEATHMATCH, 4=GAME_CIRCLETRAINING, 5=GAME_DRIVE_ME_NUTS
-;T : GRAPSTYLE 0=FIX / 1=SELECTABLE 
-;_ : FREE
-;                      _TBBMGGG
-GAME_SINGLE         = %00100001
-GAME_COMPETITION    = %00101010
-GAME_DEATHMATCH     = %01001011
-GAME_CIRCLETRAINING = %01001100
-GAME_DRIVE_ME_NUTS  = %01011101
+;[G]AMETYPE _________ 0=GAME_SINGLE
+;                     1=GAME_COMPETITION
+;                     2=GAME_DEATHMATCH
+;                     3=GAME_CIRCLETRAINING
+;                     4=GAME_DRIVE_ME_NUTS
+;[M]ULTIPLAYER ______ 0=NO
+;                     1=YES
+;[B]URGERS __________ 0=1
+;                     1=2
+;                     2=4
+;[T]AKEMODE _________ 0=FIX
+;                     1=SELECTABLE 
+;[K]EYBOARD SUPPORTED 0=NO
+;                     1=YES
+;
+;                      76543210
+;                      KTBBMGGG
+GAME_SINGLE         = %10100000
+GAME_COMPETITION    = %10101001
+GAME_DEATHMATCH     = %01001010
+GAME_CIRCLETRAINING = %01001011
+GAME_DRIVE_ME_NUTS  = %01011100
 
 FC_COLOR      = $d020
 BG_COLOR      = $d021
