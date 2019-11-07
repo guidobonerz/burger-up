@@ -146,7 +146,7 @@ player4IngridentCount:
   !byte 6,6,6,6
 
 burgerStylePointerList:
-  !word burgerStyle1,burgerStyle2,burgerStyle3,burgerStyle3
+  !word burgerStyle1,burgerStyle2,burgerStyle3,burgerStyle4
 burgerStyle1: ; standard
   !byte 9,8,7,3,1,0,$ff
 burgerStyle2: ; cheese
