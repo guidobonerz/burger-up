@@ -1,6 +1,5 @@
 *=$c000
 
-
 ;[G]AMETYPE _________ 0=GAME_SINGLE
 ;                     1=GAME_COMPETITION
 ;                     2=GAME_DEATHMATCH
@@ -13,16 +12,20 @@
 ;                     2=4
 ;[T]AKEMODE _________ 0=FIX
 ;                     1=SELECTABLE 
-;[K]EYBOARD SUPPORTED 0=NO
-;                     1=YES
+;[R]ESERVED
 ;
 ;                      76543210
-;                      KTBBMGGG
-GAME_SINGLE         = %10100000
-GAME_COMPETITION    = %10101001
+;                      RTBBMGGG
+GAME_SINGLE         = %00100000
+GAME_COMPETITION    = %00101001
 GAME_DEATHMATCH     = %01001010
 GAME_CIRCLETRAINING = %01001011
 GAME_DRIVE_ME_NUTS  = %01011100
+
+TOP    = 1
+LEFT   = 2
+BOTTOM = 3
+RIGHT  = 4 
 
 FC_COLOR      = $d020
 BG_COLOR      = $d021
@@ -72,7 +75,8 @@ highScoreTable:
   !word 2
   !text "JJJ          ",0
   !word 1
-
+keyOrJoy:
+  !byte 1
 ingridientSwapTime:
   !word 1000
 playTime:
@@ -141,12 +145,14 @@ player4SelectedBurger:
 player4IngridentCount:
   !byte 6,6,6,6
 
+burgerStylePointerList:
+  !word burgerStyle1,burgerStyle2,burgerStyle3
 burgerStyle1: ; default
-  !byte 9,8,7,4,3,1,0
+  !byte 9,8,7,4,3,1,0,$ff
 burgerStyle2: ; bacon
-  !byte 9,8,7,5,4,3,1,0
+  !byte 9,8,7,5,4,3,1,0,$ff
 burgerStyle3: ; vegan
-  !byte 9,8,7,6,2,1,0
+  !byte 9,8,7,6,2,1,0,$ff
   
 burger_chars:  
 !byte $e9,$a7,$a7,$a7,$a7,$df ; 9 top bun
@@ -202,3 +208,4 @@ init:
 start:
   
 rts
+;FLAPPY-PONG-OUT
