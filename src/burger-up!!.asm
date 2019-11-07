@@ -1,15 +1,17 @@
 *=$c000
 
 
-;B : MAX BURGERS
+;B : BURGERS 0=1 / 1=2 / 2=4
 ;M : 1=MULTIPLAYER / 0=SINGLEPLAYER
-;G : GAMETYPE
-;                      BBB0MGGG
-GAME_SINGLE         = %10000001
-GAME_COMPETITION    = %10001010
+;G : GAMETYPE 1=GAME_SINGLE, 2=GAME_COMPETITION, 3=GAME_DEATHMATCH, 4=GAME_CIRCLETRAINING, 5=GAME_DRIVE_ME_NUTS
+;T : GRAPSTYLE 0=FIX / 1=SELECTABLE 
+;_ : FREE
+;                      _TBBMGGG
+GAME_SINGLE         = %00100001
+GAME_COMPETITION    = %00101010
 GAME_DEATHMATCH     = %01001011
-GAME_ZIRKELTRAINING = %01001100
-GAME_DRIVE_ME_NUTS  = %01001101
+GAME_CIRCLETRAINING = %01001100
+GAME_DRIVE_ME_NUTS  = %01011101
 
 FC_COLOR      = $d020
 BG_COLOR      = $d021
@@ -24,12 +26,12 @@ jmp start
 gameSelectedType:
   !byte GAME_SINGLE
 gameTypeList
-  !byte GAME_SINGLE,GAME_COMPETITION,GAME_DEATHMATCH,GAME_ZIRKELTRAINING,GAME_DRIVE_ME_NUTS
+  !byte GAME_SINGLE,GAME_COMPETITION,GAME_DEATHMATCH,GAME_CIRCLETRAINING,GAME_DRIVE_ME_NUTS
 gameNames:
   !text "        SINGLE        "
   !text "      COMPETITION     "
   !text "      DEATHMATCH      "
-  !text "    ZIRKELTRAINING    "
+  !text "    CIRCLETRAINING    "
   !text "    DRIVE ME NUTS!    "
 grapMode:
   !byte GRAP_FCFS
@@ -66,8 +68,8 @@ playTime:
   !word 300
 playTimeRemaining:
   !word 0
-burgerCount:
-  !byte 4
+burgerCountList:
+  !byte 1,2,4
 playerCount:
   !byte 1
 playerGrapFlags:
@@ -77,7 +79,7 @@ playerGrapFlag:
 playerPointerList:
   !word player1,player2,player3,player4
 player1:
-  !text "CHARLY CHEESE",0
+  !word character1
 player1Score:
   !word 0
 player1Complete:
@@ -86,11 +88,11 @@ player1Mistakes:
   !byte 0
 player1SelectedBurger:
   !byte 0
-player1LayerCount:
+player1IngridentCount:
   !byte 6,6,6,6
 
 player2:
-  !text "PATTY PAT    ",0
+  !word character2
 player2Score:
   !word 0
 player2Complete:
@@ -99,11 +101,11 @@ player2Mistakes:
   !byte 0
 player2SelectedBurger:
   !byte 0
-player2LayerCount:
+player2IngridentCount:
   !byte 6,6,6,6
 
 player3:
-  !text "BEEF BOB     ",0
+ !word character3
 player3Score:
   !word 0
 player3Complete:
@@ -112,11 +114,11 @@ player3Mistakes:
   !byte 0
 player3SelectedBurger:
   !byte 0
-player3LayerCount:
+player3IngridentCount:
   !byte 6,6,6,6
 
 player4:
-  !text "TOMATO TAM   ",0
+  !word character4
 player4Score:
   !word 0
 player4Complete:
@@ -125,7 +127,7 @@ player4Mistakes:
   !byte 0
 player4SelectedBurger:
   !byte 0
-player4LayerCount:
+player4IngridentCount:
   !byte 6,6,6,6
 
 burger_chars:  
@@ -145,6 +147,23 @@ burger_colors:
 !byte $09,$09,$09,$09,$09,$09 ; patty
 !byte $08,$08,$08,$08,$08,$08 ; buttom bun
 !byte $01,$01,$01,$01,$01,$01 ; plate
+
+character1:
+!text "CHARLY CHEESE",0
+character2:
+!text "PATTY PAT    ",0
+character3:
+!text "BEEF BOB     ",0
+character4:
+!text "TOMATO TAM   ",0
+character5:
+!text "ONION OLLI   ",0
+character6:
+!text "CRUNCH CHRIS ",0
+character7:
+!text "SALTY SALLY  ",0
+character8:
+!text "CHILI CHASE  ",0
 
 init:
   lda #$00
