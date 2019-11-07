@@ -146,13 +146,20 @@ player4IngridentCount:
   !byte 6,6,6,6
 
 burgerStylePointerList:
-  !word burgerStyle1,burgerStyle2,burgerStyle3
-burgerStyle1: ; default
+  !word burgerStyle1,burgerStyle2,burgerStyle3,burgerStyle3
+burgerStyle1: ; standard
+  !byte 9,8,7,3,1,0,$ff
+burgerStyle2: ; cheese
   !byte 9,8,7,4,3,1,0,$ff
-burgerStyle2: ; bacon
+burgerStyle3: ; bacon
   !byte 9,8,7,5,4,3,1,0,$ff
-burgerStyle3: ; vegan
+burgerStyle4: ; vegan
   !byte 9,8,7,6,2,1,0,$ff
+burgerNames:
+  !text "HAMBURGER                   "
+  !text "CHEESEBURGER                "
+  !text "BACON CHEESEBURGER          "
+  !text "VEGAN GUACAMOLE BURGER      "
   
 burger_chars:  
 !byte $e9,$a7,$a7,$a7,$a7,$df ; 9 top bun
