@@ -1,4 +1,5 @@
-*=$c000
+ *=$c000
+!to "../bin/burger-up!!.prg",cbm
 
 ;[G]AMETYPE _________ 0=GAME_SINGLE
 ;                     1=GAME_COMPETITION
@@ -12,12 +13,13 @@
 ;                     2=4
 ;[T]AKEMODE _________ 0=FIX
 ;                     1=SELECTABLE 
-;[R]ESERVED
+;[K]EYBOARD SUPPORT   0=NO
+;                     1=YES
 ;
 ;                      76543210
-;                      RTBBMGGG
-GAME_SINGLE         = %00100000
-GAME_COMPETITION    = %00101001
+;                      KTBBMGGG
+GAME_SINGLE         = %10100000
+GAME_COMPETITION    = %10101001
 GAME_DEATHMATCH     = %01001010
 GAME_CIRCLETRAINING = %01001011
 GAME_DRIVE_ME_NUTS  = %01011100
@@ -35,22 +37,22 @@ USERPORT_DDR   = $dd03
 JOYSTICK_PORT1 = $dc01
 JOYSTICK_PORT2 = $dc00
 
-JOYSTICK1 = joystickStates
-JOYSTICK2 = joystickStates+1
-JOYSTICK3 = joystickStates+2
-JOYSTICK4 = joystickStates+3
+CONTROLLER1 = controllerStates
+CONTROLLER2 = controllerStates+1
+CONTROLLER3 = controllerStates+2
+CONTROLLER4 = controllerStates+3
 
 GRAP_FCFS = 0
 GRAP_AWAL = 1
 
 jmp start
-joystickStates:
+controllerStates:
   !byte 0,0,0,0
-gameSelectedType:
+gameTypeSelected:
   !byte GAME_SINGLE
 gameTypeList
   !byte GAME_SINGLE, GAME_COMPETITION, GAME_DEATHMATCH, GAME_CIRCLETRAINING, GAME_DRIVE_ME_NUTS
-gameNames:
+gameTypeText:
   !text "        SINGLE        "
   !text "      COMPETITION     "
   !text "      DEATHMATCH      "
@@ -58,13 +60,13 @@ gameNames:
   !text "    DRIVE ME NUTS!    "
 grapMode:
   !byte GRAP_FCFS
-grapModeNames:
+grapModeText:
   !text "FIRST COME FIRST SERVE"  
   !text "  ALL WIN/ALL LOOSE   "
 highScorePointerList:
   !byte 0,1,2,3,4,5,6,7,8,9
 highScoreTable:
-  !text "AAA           ",0
+  !text "AAA          ",0
   !word 10
   !text "BBB          ",0
   !word 9
@@ -84,9 +86,12 @@ highScoreTable:
   !word 2
   !text "JJJ          ",0
   !word 1
-keyOrJoy:
+keyOrJoyFlag:
   !byte 1
-ingridientSwapTime:
+keyOrJoyText
+  !text "JOYSTICK"
+  !text "KEYBOARD"
+ingredientSwapTime:
   !word 1000
 playTime:
   !word 300
@@ -112,7 +117,7 @@ player1Mistakes:
   !byte 0
 player1SelectedBurger:
   !byte 0
-player1IngridentCount:
+player1IngredientCount:
   !byte 0,0,0,0
 
 player2:
@@ -125,7 +130,7 @@ player2Mistakes:
   !byte 0
 player2SelectedBurger:
   !byte 0
-player2IngridentCount:
+player2IngredientCount:
   !byte 0,0,0,0
 
 player3:
@@ -138,7 +143,7 @@ player3Mistakes:
   !byte 0
 player3SelectedBurger:
   !byte 0
-player3IngridentCount:
+player3IngredientCount:
   !byte 0,0,0,0
 
 player4:
@@ -151,7 +156,7 @@ player4Mistakes:
   !byte 0
 player4SelectedBurger:
   !byte 0
-player4IngridentCount:
+player4IngredientCount:
   !byte 0,0,0,0
 
 burgerStyleSelected:
@@ -166,7 +171,7 @@ burgerStyle3: ; bacon
   !byte 9,8,7,5,4,3,1,0,$ff
 burgerStyle4: ; vegan
   !byte 9,8,7,6,2,1,0,$ff
-burgerIngridientsCount:
+burgerIngredientsCount:
   !byte 0
 burgerNames:
   !text "HAMBURGER             "
@@ -273,6 +278,15 @@ random6:
 !byte $00,$03,$00,$03,$01,$04,$00,$00,$00,$05,$01,$05,$04,$04,$01,$03
 !byte $01,$03,$02,$03,$02,$03,$04,$05,$00,$03,$04,$03,$05,$03,$01,$03
 
+start:
+  jsr init
+restart:
+  jsr reset
+  jsr showMainScreen
+  jsr runGame
+  jmp restart
+  rts
+
 init:
 ;init screen colors
   lda #$00
@@ -285,14 +299,30 @@ init:
   sta USERPORT_DATA ; and release Port
   rts
   
+reset:
+  rts
+
+readController:
+  pha
+  lda keyOrJoyFlag
+  cmp #$0
+  bne chooseKeyboard
+  jsr readJoystick
+  jmp controllerSelected
+chooseKeyboard:
+  jsr readKeyboard
+controllerSelected:  
+  pla
+  rts
+  
 readJoysticks:
   lda JOYSTICK_PORT1 ; read Port1
   and #$1F
-  sta JOYSTICK1
+  sta CONTROLLER1
 
   lda JOYSTICK_PORT2 ; read Port2
   and #$1F
-  sta JOYSTICK2
+  sta CONTROLLER2
 
   lda USERPORT_DATA ; CIA2 PortB Bit7 = 1
   ora #$80
@@ -300,7 +330,7 @@ readJoysticks:
 
   lda USERPORT_DATA ; read Port3
   and #$1F
-  sta JOYSTICK3
+  sta CONTROLLER3
 
   lda USERPORT_DATA ; CIA2 PortB Bit7 = 0
   and #$7F
@@ -309,33 +339,37 @@ readJoysticks:
   lda USERPORT_DATA ; read Port4
   pha ; Attention: FIRE for Port4 on Bit5, NOT 4!
   and #$0F
-  sta JOYSTICK4
+  sta CONTROLLER4
   pla
   and #$20
   lsr
-  ora JOYSTICK4
-  sta JOYSTICK4
+  ora CONTROLLER4
+  sta CONTROLLER4
   rts
 
-read_keyboard:
-  rts
-
-logJoysticks:
-  lda JOYSTICK1
-  sta $0400
-  lda JOYSTICK2
-  sta $0401
-  lda JOYSTICK3
-  sta $0402
-  lda JOYSTICK4
-  sta $0403
+showMainScreen:
   rts
   
-start:
-  jsr init
+runGame:
 joyLoop:
-  jsr readJoysticks
+  jsr readController
   jsr logJoysticks
   jmp joyLoop
   rts
+  
+readKeyboard:
+  rts
+
+logJoysticks:
+  lda CONTROLLER1
+  sta $0400
+  lda CONTROLLER2
+  sta $0401
+  lda CONTROLLER3
+  sta $0402
+  lda CONTROLLER4
+  sta $0403
+  rts
+  
+
 ;FLAPPY-PONG-OUT
