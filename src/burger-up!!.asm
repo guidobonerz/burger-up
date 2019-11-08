@@ -1,4 +1,4 @@
- *=$c000
+ *=$0801
 !to "../bin/burger-up!!.prg",cbm
 
 ;[G]AMETYPE _________ 0=GAME_SINGLE
@@ -24,11 +24,6 @@ GAME_DEATHMATCH     = %01001010
 GAME_CIRCLETRAINING = %01001011
 GAME_DRIVE_ME_NUTS  = %01011100
 
-NORMALIZED_UP    = 1
-NORMALIZED_LEFT  = 2
-NORMALIZED_DOWN  = 3
-NORMALIZED_RIGHT = 4 
-
 FC_COLOR       = $d020
 BG_COLOR       = $d021
 COLOR_RAM      = $d800
@@ -45,7 +40,13 @@ CONTROLLER4 = controllerStates+3
 GRAP_FCFS = 0
 GRAP_AWAL = 1
 
-jmp start
+CONTROLLER_KEYBOARD = 0
+CONTROLLER_JOYSTICK = 1
+
+!basic 2019,start
+;*=$c000
+;jmp start
+
 controllerStates:
   !byte 0,0,0,0
 gameTypeSelected:
@@ -87,7 +88,7 @@ highScoreTable:
   !text "JJJ          ",0
   !word 1
 keyOrJoyFlag:
-  !byte 1
+  !byte CONTROLLER_JOYSTICK
 keyOrJoyText
   !text "JOYSTICK"
   !text "KEYBOARD"
@@ -305,11 +306,15 @@ reset:
 readController:
   pha
   lda keyOrJoyFlag
-  cmp #$0
+  cmp #CONTROLLER_JOYSTICK
   bne chooseKeyboard
-  jsr readJoystick
+  lda #10
+  sta $0404
+  jsr readJoysticks
   jmp controllerSelected
 chooseKeyboard:
+  lda #11
+  sta $0404
   jsr readKeyboard
 controllerSelected:  
   pla
@@ -319,23 +324,18 @@ readJoysticks:
   lda JOYSTICK_PORT1 ; read Port1
   and #$1F
   sta CONTROLLER1
-
   lda JOYSTICK_PORT2 ; read Port2
   and #$1F
   sta CONTROLLER2
-
   lda USERPORT_DATA ; CIA2 PortB Bit7 = 1
   ora #$80
   sta USERPORT_DATA
-
   lda USERPORT_DATA ; read Port3
   and #$1F
   sta CONTROLLER3
-
   lda USERPORT_DATA ; CIA2 PortB Bit7 = 0
   and #$7F
   sta USERPORT_DATA
-
   lda USERPORT_DATA ; read Port4
   pha ; Attention: FIRE for Port4 on Bit5, NOT 4!
   and #$0F
@@ -353,14 +353,14 @@ showMainScreen:
 runGame:
 joyLoop:
   jsr readController
-  jsr logJoysticks
+  jsr logControllers
   jmp joyLoop
   rts
   
 readKeyboard:
   rts
 
-logJoysticks:
+logControllers:
   lda CONTROLLER1
   sta $0400
   lda CONTROLLER2
