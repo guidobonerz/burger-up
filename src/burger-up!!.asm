@@ -22,21 +22,30 @@ GAME_DEATHMATCH     = %01001010
 GAME_CIRCLETRAINING = %01001011
 GAME_DRIVE_ME_NUTS  = %01011100
 
-TOP    = 1
-LEFT   = 2
-BOTTOM = 3
-RIGHT  = 4 
+NORMALIZED_UP    = 1
+NORMALIZED_LEFT  = 2
+NORMALIZED_DOWN  = 3
+NORMALIZED_RIGHT = 4 
 
-FC_COLOR      = $d020
-BG_COLOR      = $d021
-COLOR_RAM     = $d800
-USERPORT_DATA = $dd01
-USERPORT_DDR  = $dd03
+FC_COLOR       = $d020
+BG_COLOR       = $d021
+COLOR_RAM      = $d800
+USERPORT_DATA  = $dd01
+USERPORT_DDR   = $dd03
+JOYSTICK_PORT1 = $dc01
+JOYSTICK_PORT2 = $dc00
+
+JOYSTICK1 = joystickStates
+JOYSTICK2 = joystickStates+1
+JOYSTICK3 = joystickStates+2
+JOYSTICK4 = joystickStates+3
 
 GRAP_FCFS = 0
 GRAP_AWAL = 1
 
 jmp start
+joystickStates:
+  !byte 0,0,0,0
 gameSelectedType:
   !byte GAME_SINGLE
 gameTypeList
@@ -104,7 +113,7 @@ player1Mistakes:
 player1SelectedBurger:
   !byte 0
 player1IngridentCount:
-  !byte 6,6,6,6
+  !byte 0,0,0,0
 
 player2:
   !word character2
@@ -117,7 +126,7 @@ player2Mistakes:
 player2SelectedBurger:
   !byte 0
 player2IngridentCount:
-  !byte 6,6,6,6
+  !byte 0,0,0,0
 
 player3:
  !word character3
@@ -130,7 +139,7 @@ player3Mistakes:
 player3SelectedBurger:
   !byte 0
 player3IngridentCount:
-  !byte 6,6,6,6
+  !byte 0,0,0,0
 
 player4:
   !word character4
@@ -143,7 +152,7 @@ player4Mistakes:
 player4SelectedBurger:
   !byte 0
 player4IngridentCount:
-  !byte 6,6,6,6
+  !byte 0,0,0,0
 
 burgerStylePointerList:
   !word burgerStyle1,burgerStyle2,burgerStyle3,burgerStyle4
@@ -207,12 +216,68 @@ character10:
 !text "VEGAN VIVIAN ",0
 
 init:
+;init screen colors
   lda #$00
   sta FC_COLOR
   sta BG_COLOR
+;init 4 player adapter  
+  lda #$80
+  sta USERPORT_DDR ; CIA2 PortB Bit7 as OUT
+  lda USERPORT_DATA ; force Clock-Stretching (SuperCPU)
+  sta USERPORT_DATA ; and release Port
+  rts
   
+readJoysticks:
+  lda JOYSTICK_PORT1 ; read Port1
+  and #$1F
+  sta JOYSTICK1
+
+  lda JOYSTICK_PORT2 ; read Port2
+  and #$1F
+  sta JOYSTICK2
+
+  lda USERPORT_DATA ; CIA2 PortB Bit7 = 1
+  ora #$80
+  sta USERPORT_DATA
+
+  lda USERPORT_DATA ; read Port3
+  and #$1F
+  sta JOYSTICK3
+
+  lda USERPORT_DATA ; CIA2 PortB Bit7 = 0
+  and #$7F
+  sta USERPORT_DATA
+
+  lda USERPORT_DATA ; read Port4
+  pha ; Attention: FIRE for Port4 on Bit5, NOT 4!
+  and #$0F
+  sta JOYSTICK4
+  pla
+  and #$20
+  lsr
+  ora JOYSTICK4
+  sta JOYSTICK4
+  rts
+
+read_keyboard:
+  rts
+
+logJoysticks:
+  lda JOYSTICK1
+  sta $0400
+  lda JOYSTICK2
+  sta $0401
+  lda JOYSTICK3
+  sta $0402
+  lda JOYSTICK4
+  sta $0403
+  rts
   
 start:
-  
-rts
+  jsr init
+joyLoop:
+  jsr readJoysticks
+  jsr logJoysticks
+  jmp joyLoop
+  rts
 ;FLAPPY-PONG-OUT
