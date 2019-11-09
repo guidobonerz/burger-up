@@ -31,24 +31,27 @@ USERPORT_DATA  = $dd01
 USERPORT_DDR   = $dd03
 JOYSTICK_PORT1 = $dc01
 JOYSTICK_PORT2 = $dc00
+CIA1_DATA_DIRA = $dc02 
+CIA1_DATA_DIRB = $dc03 
 
 CONTROLLER1 = controllerStates
 CONTROLLER2 = controllerStates+1
 CONTROLLER3 = controllerStates+2
 CONTROLLER4 = controllerStates+3
+FIREBUTTONS = controllerStates+4
 
 GRAP_FCFS = 0
 GRAP_AWAL = 1
 
-CONTROLLER_KEYBOARD = 0
-CONTROLLER_JOYSTICK = 1
+CONTROLLER_IS_KEYBOARD = 1
+CONTROLLER_IS_JOYSTICK = 0
 
 !basic 2019,start
 ;*=$c000
 ;jmp start
 
 controllerStates:
-  !byte 0,0,0,0
+  !byte 0,0,0,0,0,0
 gameTypeSelected:
   !byte GAME_SINGLE
 gameTypeList
@@ -88,7 +91,7 @@ highScoreTable:
   !text "JJJ          ",0
   !word 1
 keyOrJoyFlag:
-  !byte CONTROLLER_JOYSTICK
+  !byte CONTROLLER_IS_KEYBOARD
 keyOrJoyText
   !text "JOYSTICK"
   !text "KEYBOARD"
@@ -279,6 +282,14 @@ random6:
 !byte $00,$03,$00,$03,$01,$04,$00,$00,$00,$05,$01,$05,$04,$04,$01,$03
 !byte $01,$03,$02,$03,$02,$03,$04,$05,$00,$03,$04,$03,$05,$03,$01,$03
 
+; {SPACE}=FIRE,{[Z]or[.]=LEFT],{[X][/]=RIGHT}
+;      SPACE     Z         .        X         /
+keyRowMatrix:
+ !byte %01111111,%11111101,%11011110,%11111011,%10111111,0
+keyColumnMatrix:
+ !byte %00010000,%00010000,%10000000,%10000000,%10000000
+keyDirection:
+ !byte %00001111,%00011011,%00011011,%00010111,%00010111
 start:
   jsr init
 restart:
@@ -295,9 +306,14 @@ init:
   sta BG_COLOR
 ;init 4 player adapter  
   lda #$80
-  sta USERPORT_DDR ; CIA2 PortB Bit7 as OUT
-  lda USERPORT_DATA ; force Clock-Stretching (SuperCPU)
-  sta USERPORT_DATA ; and release Port
+  sta USERPORT_DDR 
+  lda USERPORT_DATA 
+  sta USERPORT_DATA 
+;prepare CIA1 for reading keyboard  
+  lda #$ff
+  sta CIA1_DATA_DIRA
+  lda #$00
+  sta CIA1_DATA_DIRB
   rts
   
 reset:
@@ -306,17 +322,56 @@ reset:
 readController:
   pha
   lda keyOrJoyFlag
-  cmp #CONTROLLER_JOYSTICK
+  cmp #CONTROLLER_IS_JOYSTICK
   bne chooseKeyboard
-  lda #10
-  sta $0404
   jsr readJoysticks
   jmp controllerSelected
 chooseKeyboard:
-  lda #11
-  sta $0404
   jsr readKeyboard
 controllerSelected:  
+  lda #$00
+  sta FIREBUTTONS
+  lda CONTROLLER1
+  eor #$ff
+  and #%00010000
+  beq skip1
+  lsr
+  lsr
+  lsr
+  lsr
+  ora FIREBUTTONS
+  sta FIREBUTTONS
+skip1:
+  lda keyOrJoyFlag
+  cmp #CONTROLLER_IS_KEYBOARD
+  beq skip4
+  lda CONTROLLER2
+  eor #$ff
+  and #%00010000
+  beq skip2
+  lsr
+  lsr
+  lsr
+  ora FIREBUTTONS
+  sta FIREBUTTONS
+skip2:
+  lda CONTROLLER3
+  eor #$ff 
+  and #%00010000
+  beq skip3
+  lsr
+  lsr
+  ora FIREBUTTONS
+  sta FIREBUTTONS
+skip3:
+  lda CONTROLLER4
+  eor #$ff
+  and #%00010000
+  beq skip4
+  lsr
+  ora FIREBUTTONS
+  sta FIREBUTTONS
+skip4:
   pla
   rts
   
@@ -345,8 +400,32 @@ readJoysticks:
   lsr
   ora CONTROLLER4
   sta CONTROLLER4
-  rts
+  rts 
 
+readKeyboard:
+  lda #$1f
+  tay
+  sta CONTROLLER1
+  ldx #$00
+scanLoop:
+  lda keyRowMatrix,x
+  beq noKeyFound
+  sta $dc00
+  lda $dc01
+  and keyColumnMatrix,x
+  beq keyFound
+  inx
+  jmp scanLoop
+keyFound:
+  lda keyDirection,x
+  and #$1f
+  jmp set
+noKeyFound:
+  tya
+set:
+  sta CONTROLLER1
+  rts  
+  
 showMainScreen:
   rts
   
@@ -355,9 +434,6 @@ joyLoop:
   jsr readController
   jsr logControllers
   jmp joyLoop
-  rts
-  
-readKeyboard:
   rts
 
 logControllers:
@@ -369,6 +445,12 @@ logControllers:
   sta $0402
   lda CONTROLLER4
   sta $0403
+  lda FIREBUTTONS
+  sta $0404
+  lda keyOrJoyFlag
+  clc
+  adc #10
+  sta $0408
   rts
   
 
