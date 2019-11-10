@@ -198,7 +198,7 @@ burgerChars:
 !byte  $5f,$a0,$a0,$a0,$a0,$a0,$69; 1 bottom bun
 !byte  $66,$66,$66,$66,$66,$66,$66; 2 vegan patty
 !byte  $66,$66,$66,$66,$66,$66,$66; 3 beef patty
-!byte  $e2,$e2,$e2,$e2,$e2,$e2,$e2; 4 cheese
+!byte  $62,$62,$62,$62,$62,$62,$62; 4 cheese
 !byte  $e2,$f8,$f9,$f8,$62,$f9,$f8; 5 bacon
 !byte  $62,$79,$62,$79,$62,$79,$62; 6 guacamole
 !byte  $62,$62,$62,$62,$62,$62,$62; 7 ketchup/cucumber
