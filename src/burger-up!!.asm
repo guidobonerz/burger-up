@@ -48,7 +48,7 @@ CONTROLLER_IS_JOYSTICK = 0
 
 !basic 2019,start
 ;*=$c000
-;jmp start
+jmp start
 
 controllerStates:
   !byte 0,0,0,0,0,0
@@ -199,7 +199,7 @@ burgerChars:
 !byte  $66,$66,$66,$66,$66,$66,$66; 2 vegan patty
 !byte  $66,$66,$66,$66,$66,$66,$66; 3 beef patty
 !byte  $e2,$e2,$e2,$e2,$e2,$e2,$e2; 4 cheese
-!byte  $c3,$c5,$c3,$c3,$c3,$c5,$c6; 5 bacon
+!byte  $e2,$f8,$f9,$f8,$62,$f9,$f8; 5 bacon
 !byte  $62,$79,$62,$79,$62,$79,$62; 6 guacamole
 !byte  $62,$62,$62,$62,$62,$62,$62; 7 ketchup/cucumber
 !byte  $66,$66,$66,$66,$66,$66,$66; 8 salad
@@ -211,11 +211,12 @@ burgerColors:
 !byte  $09,$05,$09,$05,$09,$05,$09; 2 vegan patty
 !byte  $09,$09,$09,$09,$09,$09,$09; 3 beef patty
 !byte  $07,$07,$07,$07,$07,$07,$07; 4 cheese
-!byte  $0a,$02,$08,$02,$0a,$02,$09; 5 bacon
+!byte  $0a,$02,$09,$02,$01,$09,$0a; 5 bacon
 !byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d; 6 guacamole
 !byte  $02,$0a,$02,$05,$0d,$05,$0d; 7 ketchup/cucumber
 !byte  $05,$0d,$05,$0d,$05,$0d,$05; 8 salad
 !byte  $08,$08,$08,$08,$08,$08,$08; 9 top bun
+
 
 
 character1:
@@ -301,7 +302,7 @@ keyColumnMatrix:
 keyDirection:
  !byte %00001111,%00011011,%00011011,%00010111,%00010111
 start:
-  rts
+  ;rts
   jsr init
 restart:
   jsr reset
@@ -315,6 +316,7 @@ init:
   lda #$00
   sta FC_COLOR
   sta BG_COLOR
+  jsr $e544
 ;init 4 player adapter  
   lda #$80
   sta USERPORT_DDR 
@@ -517,9 +519,7 @@ burgerSizeFound:
   pla
   tay
   pla
-  ;tax
 ;calculate plate offset
-  ;txa
   sta $92
   sta $f7
   lda #$04
@@ -548,29 +548,59 @@ exitCalcPlateLoop:
   ldy #$00
 getNextIngredientIndex:  
   lda ($94),y
-  cmp burgerIngredientsCount
+  cmp #$ff
   beq burgerCompleteDrawn
+  sta ingredientIndex
   jsr drawIngredient
-  clc
-  adc #$07
+  iny
   jmp getNextIngredientIndex
 burgerCompleteDrawn:
   rts
-
+ingredientIndex:
+  !byte 0
 drawIngredient:
-  pha
   tya
   pha
-  txa
-  pha
-  lda burgerChars,y
   
-  
-  pla
+  lda #$00
+  ldx ingredientIndex
+calculateIngredientOffset:
+  beq calculateIngredientOffsetExit
+  clc
+  adc #$07
+  dex
+  jmp calculateIngredientOffset
+calculateIngredientOffsetExit:
   tax
+  
+  ldy #$00
+drawIngredientLoop:
+  lda burgerChars,x
+  sta ($92),y
+  lda burgerColors,x
+  sta ($f7),y
+  inx
+  iny
+  cpy #$07
+  bne drawIngredientLoop
+  sec
+  lda $92
+  sbc #$28
+  sta $92
+  lda $93
+  sbc #$00
+  sta $93
+  sec
+  lda $f7
+  sbc #$28
+  sta $f7
+  lda $f8
+  sbc #$00
+  sta $f8
+  
+  
   pla
   tay
-  pla
   rts
   
   
