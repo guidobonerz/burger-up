@@ -123,6 +123,8 @@ player1SelectedBurger:
   !byte 0
 player1IngredientCount:
   !byte 0,0,0,0
+player1BurgerOffsets:
+  !word 0,0,0,0
 
 player2:
   !word character2
@@ -136,7 +138,9 @@ player2SelectedBurger:
   !byte 0
 player2IngredientCount:
   !byte 0,0,0,0
-
+player2BurgerOffsets:
+  !word 0,0,0,0
+  
 player3:
  !word character3
 player3Score:
@@ -149,7 +153,9 @@ player3SelectedBurger:
   !byte 0
 player3IngredientCount:
   !byte 0,0,0,0
-
+player3BurgerOffsets:
+  !word 0,0,0,0
+  
 player4:
   !word character4
 player4Score:
@@ -162,19 +168,21 @@ player4SelectedBurger:
   !byte 0
 player4IngredientCount:
   !byte 0,0,0,0
-
+player4BurgerOffsets:
+  !word 0,0,0,0
+  
 burgerStyleSelected:
   !byte 0
 burgerStylePointerList:
   !word burgerStyle1, burgerStyle2, burgerStyle3, burgerStyle4
 burgerStyle1: ; standard
-  !byte 9,8,7,3,1,0,$ff
+  !byte 0,1,3,7,8,9,$ff
 burgerStyle2: ; cheese
-  !byte 9,8,7,4,3,1,0,$ff
+  !byte 0,1,3,4,7,8,9,$ff
 burgerStyle3: ; bacon
-  !byte 9,8,7,5,4,3,1,0,$ff
+  !byte 0,1,3,4,5,7,8,9,$ff
 burgerStyle4: ; vegan
-  !byte 9,8,7,6,2,1,0,$ff
+  !byte 0,1,2,6,7,8,9,$ff
 burgerIngredientsCount:
   !byte 0
 burgerRandomIngredient:
@@ -184,30 +192,31 @@ burgerNames:
   !text "CHEESEBURGER          "
   !text "BACON CHEESEBURGER    "
   !text "VEGAN GUACAMOLE BURGER"
-  
-burger_chars:  
-!byte $e9,$a7,$a7,$a7,$a7,$df ; 9 top bun
-!byte $66,$66,$66,$66,$66,$66 ; 8 salad
-!byte $62,$62,$62,$62,$62,$62 ; 7 ketchup/cucumber
-!byte                         ; 6 guacamole
-!byte                         ; 5 bacon
-!byte $62,$62,$62,$62,$62,$62 ; 4 cheese
-!byte $66,$66,$66,$66,$66,$66 ; 3 beef patty
-!byte $66,$66,$66,$66,$66,$66 ; 2 vegan patty
-!byte $5f,$a0,$a0,$a0,$a0,$69 ; 1 bottom bun
-!byte $77,$78,$78,$78,$78,$77 ; 0 plate
 
-burger_colors:
-!byte $08,$08,$08,$08,$08,$08 ; 9 top bun 
-!byte $05,$0d,$05,$0d,$05,$0d ; 8 salad
-!byte $02,$0a,$02,$05,$0d,$05 ; 7 ketchup/cucumber
-!byte                         ; 6 guacamole
-!byte                         ; 5 bacon
-!byte $07,$07,$07,$07,$07,$08 ; 4 cheese
-!byte $09,$09,$09,$09,$09,$09 ; 3 beef patty
-!byte $09,$09,$09,$09,$09,$09 ; 2 vegan patty
-!byte $08,$08,$08,$08,$08,$08 ; 1 buttom bun
-!byte $01,$01,$01,$01,$01,$01 ; 0 plate
+burgerChars: 
+!byte  $77,$e2,$e2,$e2,$e2,$e2,$77; 0 plate
+!byte  $5f,$a0,$a0,$a0,$a0,$a0,$69; 1 bottom bun
+!byte  $66,$66,$66,$66,$66,$66,$66; 2 vegan patty
+!byte  $66,$66,$66,$66,$66,$66,$66; 3 beef patty
+!byte  $e2,$e2,$e2,$e2,$e2,$e2,$e2; 4 cheese
+!byte  $c3,$c5,$c3,$c3,$c3,$c5,$c6; 5 bacon
+!byte  $62,$79,$62,$79,$62,$79,$62; 6 guacamole
+!byte  $62,$62,$62,$62,$62,$62,$62; 7 ketchup/cucumber
+!byte  $66,$66,$66,$66,$66,$66,$66; 8 salad
+!byte  $e9,$a7,$a7,$a7,$a7,$a7,$df; 9 top bun
+
+burgerColors:
+!byte  $01,$01,$01,$01,$01,$01,$01; 0 plate
+!byte  $08,$08,$08,$08,$08,$08,$08; 1 bottom bun
+!byte  $09,$05,$09,$05,$09,$05,$09; 2 vegan patty
+!byte  $09,$09,$09,$09,$09,$09,$09; 3 beef patty
+!byte  $07,$07,$07,$07,$07,$07,$07; 4 cheese
+!byte  $0a,$02,$08,$02,$0a,$02,$09; 5 bacon
+!byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d; 6 guacamole
+!byte  $02,$0a,$02,$05,$0d,$05,$0d; 7 ketchup/cucumber
+!byte  $05,$0d,$05,$0d,$05,$0d,$05; 8 salad
+!byte  $08,$08,$08,$08,$08,$08,$08; 9 top bun
+
 
 character1:
 !text "CHARLY CHEESE",0
@@ -292,12 +301,13 @@ keyColumnMatrix:
 keyDirection:
  !byte %00001111,%00011011,%00011011,%00010111,%00010111
 start:
+  rts
   jsr init
 restart:
   jsr reset
   jsr showMainScreen
   jsr runGame
-  jmp restart
+  ;jmp restart
   rts
 
 init:
@@ -457,14 +467,124 @@ ingredientFound:
   sta burgerRandomIngredient
   rts
   
+showBurgerVariants:
+  lda #00 ; hamburger
+  ldx #03 
+  ldy #12
+  sta burgerStyleSelected
+  jsr displayBurger
+  lda #01 ; cheeseburger
+  ldx #11 
+  ldy #12
+  sta burgerStyleSelected
+  jsr displayBurger
+  lda #02 ; bacon chesse burger
+  ldx #19 
+  ldy #12
+  sta burgerStyleSelected
+  jsr displayBurger
+  lda #03 ; vegan burger
+  ldx #27 
+  ldy #12
+  sta burgerStyleSelected
+  jsr displayBurger
+  rts
+  
+displayBurger:
+  txa
+  pha
+  tya
+  pha
+  ldx burgerStyleSelected
+  txa 
+  asl
+  tax
+  lda burgerStylePointerList,x
+  sta $94
+  inx
+  lda burgerStylePointerList,x
+  sta $95
+  ldy #$00
+getNextIngredient:
+  lda ($94),y
+  cmp #$ff
+  beq burgerSizeFound
+  iny
+  jmp getNextIngredient
+burgerSizeFound:
+  dey
+  sty burgerIngredientsCount
+  pla
+  tay
+  pla
+  ;tax
+;calculate plate offset
+  ;txa
+  sta $92
+  sta $f7
+  lda #$04
+  sta $93
+  lda #$d8
+  sta $f8
+calcPlateLoop:  
+  clc
+  lda $92
+  adc #$28
+  sta $92
+  bcc noCarryBitChar
+  inc $93
+noCarryBitChar:  
+  clc
+  lda $f7
+  adc #$28
+  sta $f7
+  bcc noCarryBitColor
+  inc $f8
+noCarryBitColor:
+  dey
+  beq exitCalcPlateLoop
+  jmp calcPlateLoop
+exitCalcPlateLoop:
+  ldy #$00
+getNextIngredientIndex:  
+  lda ($94),y
+  cmp burgerIngredientsCount
+  beq burgerCompleteDrawn
+  jsr drawIngredient
+  clc
+  adc #$07
+  jmp getNextIngredientIndex
+burgerCompleteDrawn:
+  rts
+
+drawIngredient:
+  pha
+  tya
+  pha
+  txa
+  pha
+  lda burgerChars,y
+  
+  
+  pla
+  tax
+  pla
+  tay
+  pla
+  rts
+  
+  
+  
 showMainScreen:
   rts
   
 runGame:
 joyLoop:
-  jsr readController
-  jsr logControllers
-  jmp joyLoop
+  ;jsr readController
+  ;jsr logControllers
+  jsr showBurgerVariants
+loop:
+  ;jmp loop
   rts
 
 logControllers:
