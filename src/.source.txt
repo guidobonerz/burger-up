@@ -101,7 +101,7 @@ highScoreTable:
   .byte 0
   .word 1
 keyOrJoyFlag:
-  .byte CONTROLLER_IS_JOYSTICK
+  .byte CONTROLLER_IS_KEYBOARD
 keyOrJoyText:
   .text "JOYSTICK"
   .text "KEYBOARD"
@@ -668,11 +668,12 @@ showMainScreen:
   rts
   
 runGame:
-loop:
-  jsr readController
-  jsr logControllers
+joyLoop:
+  //;jsr readController
+  //;jsr logControllers
   //jsr showBurgerVariants
-  //jsr logRandomIngredient
+loop:
+    jsr logRandomIngredient
 
   jmp loop
   rts
