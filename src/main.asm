@@ -1,23 +1,22 @@
 .pc = $0801
-//.to "../bin/burger-up...prg",cbm
 
 //[G]AMETYPE _________ 0=GAME_SINGLE
 //                     1=GAME_COMPETITION
-//;                     2=GAME_DEATHMATCH
-//;                     3=GAME_CIRCLETRAINING
-//;                     4=GAME_DRIVE_ME_NUTS
-//;[M]ULTIPLAYER ______ 0=NO
-//;                     1=YES
-//;[B]URGERS __________ 0=1
-//;                     1=2
-//;                     2=4
-//;[T]AKEMODE _________ 0=FIX
-//;                     1=SELECTABLE 
-//;[K]EYBOARD SUPPORT   0=NO
-//;                     1=YES
-//;
-//;                      76543210
-//;                      KTBBMGGG
+//                     2=GAME_DEATHMATCH
+//                     3=GAME_CIRCLETRAINING
+//                     4=GAME_DRIVE_ME_NUTS
+//[M]ULTIPLAYER ______ 0=NO
+//                     1=YES
+//[B]URGERS __________ 0=1
+//                     1=2
+//                     2=4
+//[T]AKEMODE _________ 0=FIX
+//                     1=SELECTABLE 
+//[K]EYBOARD SUPPORT   0=NO
+//                     1=YES
+//
+//                            76543210
+//                            KTBBMGGG
 .const GAME_SINGLE         = %10100000
 .const GAME_COMPETITION    = %10101001
 .const GAME_DEATHMATCH     = %01001010
@@ -40,8 +39,8 @@
 .const CONTROLLER4 = controllerStates+3
 .const FIREBUTTONS = controllerStates+4
 
-.const GRAP_FCFS = 0
-.const GRAP_AWAL = 1
+.const GRAP_FCFS = 0  // First come first serve
+.const GRAP_AWAL = 1  // All win / All loose
 
 .const CONTROLLER_IS_KEYBOARD = 1 
 .const CONTROLLER_IS_JOYSTICK = 0
@@ -57,11 +56,11 @@ gameTypeSelected:
 gameTypeList:
   .byte GAME_SINGLE, GAME_COMPETITION, GAME_DEATHMATCH, GAME_CIRCLETRAINING, GAME_DRIVE_ME_NUTS
 gameTypeText:
-  .text "        SINGLE        "
-  .text "      COMPETITION     "
-  .text "      DEATHMATCH      "
-  .text "    CIRCLETRAINING    "
-  .text "    DRIVE ME NUTS!    "
+  .text "        SINGLE         "
+  .text "      COMPETITION      "
+  .text "      DEATH MATCH      "
+  .text "    CIRCLE TRAINING    "
+  .text "     DRIVE ME NUTS     "
 grapMode:
   .byte GRAP_FCFS
 grapModeText:
@@ -105,10 +104,10 @@ keyOrJoyFlag:
 keyOrJoyText:
   .text "JOYSTICK"
   .text "KEYBOARD"
-ingredientSwapTime:
-  .word 1000
+ingredientSwapTime: // milliseconds
+  .word 1000 
 playTime:
-  .word 300
+  .word 300 // seconds
 playTimeRemaining:
   .word 0
 burgerCountList:
@@ -185,13 +184,13 @@ burgerStyleSelected:
   .byte 0
 burgerStylePointerList:
   .word burgerStyle1, burgerStyle2, burgerStyle3, burgerStyle4
-burgerStyle1: //; standard
+burgerStyle1: // standard
   .byte 0,1,3,7,8,9,$ff
-burgerStyle2: //; cheese
+burgerStyle2: // cheese
   .byte 0,1,3,4,7,8,9,$ff
-burgerStyle3: //; bacon
+burgerStyle3: // bacon
   .byte 0,1,3,4,5,7,8,9,$ff
-burgerStyle4: //; vegan
+burgerStyle4: // vegan
   .byte 0,1,2,6,7,8,9,$ff
 burgerIngredientsCount:
   .byte 5
@@ -204,29 +203,29 @@ burgerNames:
   .text "VEGAN GUACAMOLE BURGER"
 
 burgerChars: 
-.byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77//; 0 plate
-.byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69//; 1 bottom bun
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66//; 2 vegan patty
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66//; 3 beef patty
-.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62//; 4 cheese
-.byte  $e2,$f8,$f9,$f8,$62,$f9,$f8,$62,$e2//; 5 bacon
-.byte  $62,$79,$62,$79,$62,$79,$62,$79,$62//; 6 guacamole
-.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62//; 7 ketchup/cucumber
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66//; 8 salad
-.byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df//; 9 top bun
+.byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 0 plate
+.byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69// 1 bottom bun
+.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 2 vegan patty
+.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 3 beef patty
+.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 4 cheese
+.byte  $e2,$f8,$f9,$f8,$62,$f9,$f8,$62,$e2// 5 bacon
+.byte  $62,$79,$62,$79,$62,$79,$62,$79,$62// 6 guacamole
+.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 7 ketchup/cucumber
+.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 8 salad
+.byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 9 top bun
 
 
 burgerColors:
-.byte  $01,$01,$01,$01,$01,$01,$01,$01,$01//; 0 plate
-.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08//; 1 bottom bun
-.byte  $09,$05,$09,$05,$09,$05,$09,$05,$09//; 2 vegan patty
-.byte  $09,$09,$09,$09,$09,$09,$09,$09,$09//; 3 beef patty
-.byte  $07,$07,$07,$07,$07,$07,$07,$07,$07//; 4 cheese
-.byte  $0a,$02,$09,$02,$01,$09,$0a,$02,$09//; 5 bacon
-.byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d//; 6 guacamole
-.byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d//; 7 ketchup/cucumber
-.byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05//; 8 salad
-.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08//; 9 top bun
+.byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 0 plate
+.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 1 bottom bun
+.byte  $09,$05,$09,$05,$09,$05,$09,$05,$09// 2 vegan patty
+.byte  $09,$09,$09,$09,$09,$09,$09,$09,$09// 3 beef patty
+.byte  $07,$07,$07,$07,$07,$07,$07,$07,$07// 4 cheese
+.byte  $0a,$02,$09,$02,$01,$09,$0a,$02,$09// 5 bacon
+.byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d// 6 guacamole
+.byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 7 ketchup/cucumber
+.byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 8 salad
+.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 9 top bun
 
 
 
@@ -314,8 +313,8 @@ random7:
   .byte $06,$05,$01,$04,$00,$05,$06,$01,$06,$00,$01,$00,$03,$02,$06,$01
 seed:
   .byte %11001010
-//; {SPACE}=FIRE,{[Z]or[.]=LEFT],{[X][/]=RIGHT}
-//;      SPACE     Z         .        X         /
+// {SPACE}=FIRE,{[Z]or[.]=LEFT],{[X][/]=RIGHT}
+//      SPACE     Z         .        X         /
 keyRowMatrix:
  .byte %01111111,%11111101,%11011110,%11111011,%10111111,%01111111,%01111111,%11111101,%11111101,0
 keyColumnMatrix:
@@ -333,17 +332,17 @@ restart:
   rts
 
 init:
-//;init screen colors
+//init screen colors
   lda #$00
   sta FC_COLOR
   sta BG_COLOR
   jsr $e544
-//;init 4 player adapter  
+//init 4 player adapter  
   lda #$80
   sta USERPORT_DDR 
   lda USERPORT_DATA 
   sta USERPORT_DATA 
-//;prepare CIA1 for reading keyboard  
+//prepare CIA1 for reading keyboard  
   lda #$ff
   sta CIA1_DATA_DIRA
   lda #$00
@@ -410,23 +409,23 @@ skip4:
   rts
   
 readJoysticks:
-  lda JOYSTICK_PORT1 //; read Port1
+  lda JOYSTICK_PORT1 // read Port1
   and #$1F
   sta CONTROLLER1
-  lda JOYSTICK_PORT2 //; read Port2
+  lda JOYSTICK_PORT2 // read Port2
   and #$1F
   sta CONTROLLER2
-  lda USERPORT_DATA //; CIA2 PortB Bit7 = 1
+  lda USERPORT_DATA // CIA2 PortB Bit7 = 1
   ora #$80
   sta USERPORT_DATA
-  lda USERPORT_DATA //; read Port3
+  lda USERPORT_DATA // read Port3
   and #$1F
   sta CONTROLLER3
-  lda USERPORT_DATA //; CIA2 PortB Bit7 = 0
+  lda USERPORT_DATA // CIA2 PortB Bit7 = 0
   and #$7F
   sta USERPORT_DATA
-  lda USERPORT_DATA //; read Port4
-  pha //; Attention: FIRE for Port4 on Bit5, NOT 4.
+  lda USERPORT_DATA // read Port4
+  pha // Attention: FIRE for Port4 on Bit5, NOT 4.
   and #$0F
   sta CONTROLLER4
   pla
@@ -494,49 +493,49 @@ ingredientFound:
 showBurgerVariants:
   lda #$01
   sta $a4
-  lda #00 //; hamburger
+  lda #00 // hamburger
   ldx #00 
   ldy #13
   sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$02
   sta $a4
-  lda #00 //; cheeseburger
+  lda #00 // cheeseburger
   ldx #10 
   ldy #13
   sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$03
   sta $a4
-  lda #00 //; bacon chesse burger
+  lda #00 // bacon chesse burger
   ldx #21 
   ldy #13
   sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$04
   sta $a4
-  lda #00 //; vegan burger
+  lda #00 // vegan burger
   ldx #31 
   ldy #13
   sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$05
   sta $a4
-  lda #00 //; hamburger
+  lda #00 // hamburger
   ldx #00 
   ldy #24
   sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$06
   sta $a4
-  lda #01 //; cheeseburger
+  lda #01 // cheeseburger
   ldx #10 
   ldy #24
   sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$07
   sta $a4
-  lda #01 //; bacon chesse burger
+  lda #01 // bacon chesse burger
   ldx #21 
   ldy #24
   sta burgerStyleSelected
@@ -577,7 +576,7 @@ burgerSizeFound:
   pla
   tay
   pla
-//;calculate plate offset
+//calculate plate offset
   sta $92
   sta $f7
   lda #$04
@@ -700,4 +699,3 @@ logControllers:
   rts
   
 
-//;FLAPPY-PONG-OUT
