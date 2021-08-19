@@ -42,8 +42,31 @@
 .const GRAP_FCFS = 0  // First come first serve
 .const GRAP_AWAL = 1  // All win / All loose
 
-.const CONTROLLER_IS_KEYBOARD = 1 
-.const CONTROLLER_IS_JOYSTICK = 0
+.const CONTROLLED_BY_KEYBOARD = 1 
+.const CONTROLLED_BY_JOYSTICK = 0
+
+.macro PlayerData(character) {
+player:
+  .word character4
+playerName:
+  .byte 20
+playerScore:
+  .word 0
+playerComplete:
+  .byte 0
+playerMistakes:
+  .byte 0
+playerSelectedBurger:
+  .byte 0
+playerIngredientCount:
+  .byte 0,0,0,0
+playerBurgerOffsets:
+  .word 0,0,0,0
+}
+
+.macro RandomIngredientTable(max){
+  .for(var i=0;i<=256;i++) .byte random()*max
+}
 
 :BasicUpstart2(start)
 //;*=$c000
@@ -51,16 +74,18 @@
 
 controllerStates:
   .byte 0,0,0,0,0,0
+canHaveRandomGaps:
+  .byte 0
 gameTypeSelected:
   .byte GAME_SINGLE
 gameTypeList:
   .byte GAME_SINGLE, GAME_COMPETITION, GAME_DEATHMATCH, GAME_CIRCLETRAINING, GAME_DRIVE_ME_NUTS
 gameTypeText:
-  .text "        SINGLE         "
-  .text "      COMPETITION      "
-  .text "      DEATH MATCH      "
-  .text "    CIRCLE TRAINING    "
-  .text "     DRIVE ME NUTS     "
+  .text "    SINGLE     "
+  .text "  COMPETITION  "
+  .text "  DEATH MATCH  "
+  .text "CIRCLE TRAINING"
+  .text " DRIVE ME NUTS "
 grapMode:
   .byte GRAP_FCFS
 grapModeText:
@@ -100,7 +125,7 @@ highScoreTable:
   .byte 0
   .word 1
 keyOrJoyFlag:
-  .byte CONTROLLER_IS_JOYSTICK
+  .byte CONTROLLED_BY_JOYSTICK
 keyOrJoyText:
   .text "JOYSTICK"
   .text "KEYBOARD"
@@ -121,64 +146,13 @@ playerGrapFlag:
 playerPointerList:
   .word player1, player2, player3, player4
 player1:
-  .word character1
-player1Score:
-  .word 0
-player1Complete:
-  .byte 0
-player1Mistakes:
-  .byte 0
-player1SelectedBurger:
-  .byte 0
-player1IngredientCount:
-  .byte 0,0,0,0
-player1BurgerOffsets:
-  .word 0,0,0,0
-
+ PlayerData(character1)
 player2:
-  .word character2
-player2Score:
-  .word 0
-player2Complete:
-  .byte 0
-player2Mistakes:
-  .byte 0
-player2SelectedBurger:
-  .byte 0
-player2IngredientCount:
-  .byte 0,0,0,0
-player2BurgerOffsets:
-  .word 0,0,0,0
-  
+ PlayerData(character2)
 player3:
- .word character3
-player3Score:
-  .word 0
-player3Complete:
-  .byte 0
-player3Mistakes:
-  .byte 0
-player3SelectedBurger:
-  .byte 0
-player3IngredientCount:
-  .byte 0,0,0,0
-player3BurgerOffsets:
-  .word 0,0,0,0
-  
+ PlayerData(character3)
 player4:
-  .word character4
-player4Score:
-  .word 0
-player4Complete:
-  .byte 0
-player4Mistakes:
-  .byte 0
-player4SelectedBurger:
-  .byte 0
-player4IngredientCount:
-  .byte 0,0,0,0
-player4BurgerOffsets:
-  .word 0,0,0,0
+ PlayerData(character4)
   
 burgerStyleSelected:
   .byte 0
@@ -261,56 +235,11 @@ character10:
 .byte 0
 
 random5:
-  .byte $02,$02,$02,$04,$01,$02,$01,$01,$03,$03,$04,$01,$01,$00,$04,$00
-  .byte $03,$04,$03,$02,$01,$04,$03,$00,$01,$03,$00,$01,$04,$01,$01,$03
-  .byte $03,$04,$02,$03,$02,$03,$01,$04,$01,$03,$02,$02,$00,$03,$00,$00
-  .byte $02,$01,$03,$00,$00,$03,$03,$03,$03,$03,$00,$01,$03,$03,$03,$02
-  .byte $02,$02,$04,$00,$04,$03,$02,$03,$03,$02,$03,$01,$00,$01,$01,$02
-  .byte $01,$00,$02,$04,$01,$01,$01,$01,$03,$04,$03,$03,$04,$01,$03,$02
-  .byte $01,$04,$04,$02,$04,$00,$01,$00,$00,$03,$00,$04,$04,$03,$03,$02
-  .byte $00,$00,$00,$00,$03,$01,$00,$03,$04,$00,$01,$00,$03,$04,$04,$00
-  .byte $04,$00,$04,$00,$00,$01,$02,$02,$03,$00,$00,$02,$02,$01,$02,$01
-  .byte $02,$02,$01,$04,$01,$00,$04,$03,$00,$02,$00,$00,$01,$01,$03,$04
-  .byte $02,$02,$02,$03,$03,$03,$04,$00,$03,$03,$00,$03,$00,$00,$04,$02
-  .byte $02,$03,$02,$00,$01,$03,$03,$03,$01,$03,$01,$04,$01,$03,$00,$03
-  .byte $03,$04,$04,$01,$02,$02,$03,$02,$01,$04,$03,$04,$02,$02,$01,$00
-  .byte $00,$00,$01,$02,$01,$03,$00,$00,$01,$00,$01,$02,$04,$02,$02,$04
-  .byte $02,$02,$00,$04,$01,$01,$04,$02,$00,$02,$04,$00,$04,$03,$01,$03
-  .byte $04,$04,$03,$04,$01,$02,$01,$01,$03,$01,$00,$01,$00,$02,$03,$03
+ RandomIngredientTable(5)
 random6:
-  .byte $04,$03,$00,$01,$05,$04,$03,$03,$03,$05,$04,$03,$05,$05,$01,$02
-  .byte $00,$00,$03,$05,$05,$00,$05,$00,$03,$05,$00,$01,$00,$03,$02,$04
-  .byte $04,$01,$01,$00,$03,$01,$01,$00,$05,$01,$00,$05,$03,$00,$02,$03
-  .byte $02,$00,$03,$00,$00,$03,$04,$05,$00,$02,$00,$05,$03,$01,$05,$02
-  .byte $02,$02,$04,$00,$02,$02,$04,$05,$04,$02,$04,$01,$00,$02,$05,$00
-  .byte $01,$03,$03,$04,$02,$05,$02,$02,$01,$02,$03,$00,$05,$01,$04,$04
-  .byte $04,$05,$00,$00,$02,$05,$04,$03,$00,$05,$05,$04,$01,$05,$03,$00
-  .byte $02,$03,$05,$05,$00,$00,$00,$03,$00,$01,$00,$00,$04,$00,$00,$02
-  .byte $00,$02,$03,$00,$00,$05,$05,$01,$00,$05,$02,$03,$05,$03,$01,$05
-  .byte $05,$04,$04,$02,$00,$03,$04,$01,$02,$03,$03,$03,$01,$05,$01,$01
-  .byte $01,$03,$04,$04,$01,$04,$04,$02,$03,$00,$05,$03,$04,$04,$01,$03
-  .byte $00,$02,$05,$05,$00,$03,$05,$02,$05,$05,$03,$02,$05,$00,$04,$02
-  .byte $01,$00,$01,$04,$00,$00,$02,$04,$00,$04,$05,$02,$03,$04,$02,$05
-  .byte $04,$00,$05,$02,$02,$04,$02,$05,$02,$03,$04,$00,$00,$05,$00,$00
-  .byte $04,$00,$01,$03,$03,$02,$05,$05,$04,$05,$03,$02,$01,$02,$04,$03
-  .byte $00,$03,$03,$05,$00,$02,$03,$01,$01,$05,$02,$03,$00,$02,$03,$02
+ RandomIngredientTable(6)
 random7:
-  .byte $05,$06,$06,$06,$04,$05,$03,$06,$06,$06,$00,$04,$03,$02,$04,$03
-  .byte $02,$06,$00,$00,$05,$02,$00,$03,$01,$04,$06,$04,$05,$02,$00,$01
-  .byte $05,$01,$04,$00,$03,$05,$00,$03,$06,$06,$04,$00,$06,$02,$00,$03
-  .byte $00,$01,$06,$03,$04,$05,$04,$04,$03,$01,$00,$06,$01,$06,$00,$04
-  .byte $06,$04,$00,$05,$02,$05,$00,$03,$01,$00,$03,$04,$03,$01,$04,$03
-  .byte $06,$04,$04,$01,$00,$02,$03,$00,$01,$06,$06,$05,$05,$04,$04,$03
-  .byte $05,$00,$02,$03,$05,$04,$01,$01,$02,$02,$06,$05,$00,$02,$01,$00
-  .byte $00,$04,$03,$00,$02,$02,$03,$01,$01,$00,$05,$05,$01,$01,$03,$00
-  .byte $06,$00,$01,$01,$02,$05,$04,$02,$01,$03,$06,$05,$01,$06,$05,$03
-  .byte $00,$00,$04,$05,$03,$02,$03,$05,$05,$06,$03,$03,$02,$01,$04,$03
-  .byte $04,$05,$00,$06,$05,$05,$04,$02,$06,$02,$05,$06,$02,$00,$02,$03
-  .byte $01,$03,$06,$03,$04,$04,$05,$03,$01,$06,$02,$05,$05,$02,$02,$04
-  .byte $04,$05,$05,$02,$03,$04,$03,$06,$06,$02,$03,$02,$02,$06,$01,$00
-  .byte $05,$04,$01,$02,$05,$06,$05,$03,$04,$06,$04,$01,$06,$04,$04,$02
-  .byte $06,$03,$02,$01,$00,$05,$04,$04,$06,$03,$02,$05,$04,$04,$05,$04
-  .byte $06,$05,$01,$04,$00,$05,$06,$01,$06,$00,$01,$00,$03,$02,$06,$01
+ RandomIngredientTable(7)
 seed:
   .byte %11001010
 // {SPACE}=FIRE,{[Z]or[.]=LEFT],{[X][/]=RIGHT}
@@ -333,6 +262,7 @@ restart:
 
 init:
 //init screen colors
+ 
   lda #$00
   sta FC_COLOR
   sta BG_COLOR
@@ -355,7 +285,7 @@ reset:
 readController:
   pha
   lda keyOrJoyFlag
-  cmp #CONTROLLER_IS_JOYSTICK
+  cmp #CONTROLLED_BY_JOYSTICK
   bne chooseKeyboard
   jsr readJoysticks
   jmp controllerSelected
@@ -376,7 +306,7 @@ controllerSelected:
   sta FIREBUTTONS
 skip1:
   lda keyOrJoyFlag
-  cmp #CONTROLLER_IS_KEYBOARD
+  cmp #CONTROLLED_BY_KEYBOARD
   beq skip4
   lda CONTROLLER2
   eor #$ff
@@ -398,7 +328,7 @@ skip2:
   sta FIREBUTTONS
 skip3:
   lda CONTROLLER4
-  eor #$ff
+  eor #$ff  
   and #%00010000
   beq skip4
   lsr
@@ -670,10 +600,10 @@ runGame:
 loop:
   jsr readController
   jsr logControllers
-  //jsr showBurgerVariants
+  jsr showBurgerVariants
   //jsr logRandomIngredient
 
-  jmp loop
+  //jmp loop
   rts
 
 logRandomIngredient:
