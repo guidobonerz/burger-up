@@ -155,19 +155,23 @@ player4:
  PlayerData(character4)
   
 burgerStyleSelected:
-  .byte 0
-burgerStylePointerList:
-  .word burgerStyle1, burgerStyle2, burgerStyle3, burgerStyle4
-burgerStyle1: // standard
-  .byte 0,1,3,7,8,9,$ff
-burgerStyle2: // cheese
-  .byte 0,1,3,4,7,8,9,$ff
-burgerStyle3: // bacon
-  .byte 0,1,3,4,5,7,8,9,$ff
-burgerStyle4: // vegan
-  .byte 0,1,2,6,7,8,9,$ff
-burgerIngredientsCount:
+  .byte 4
+maxBurgerStyles:
   .byte 5
+burgerStylePointerList:
+  .word burgerStyle1, burgerStyle2, burgerStyle3, burgerStyle4, burgerStyle5
+burgerStyle1: // standard
+  .byte 0,1,3,8,9,10,$ff
+burgerStyle2: // cheese
+  .byte 0,1,3,4,8,9,10,$ff
+burgerStyle3: // bacon
+  .byte 0,1,3,4,6,8,9,10,$ff
+burgerStyle4: // vegan
+  .byte 0,1,2,7,8,9,10,$ff
+burgerStyle5: // double chili
+  .byte 0,1,3,4,3,5,10,$ff
+burgerIngredientsCount:
+  .byte 0
 burgerRandomIngredient:
   .byte 0
 burgerNames:
@@ -175,33 +179,47 @@ burgerNames:
   .text "     CHEESEBURGER     "
   .text "  BACON CHEESEBURGER  "
   .text "VEGAN GUACAMOLE BURGER"
+  .text "HOT DOUBLE CHILIBURGER"
 
 burgerChars: 
-.byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 0 plate
-.byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69// 1 bottom bun
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 2 vegan patty
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 3 beef patty
-.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 4 cheese
-.byte  $e2,$f8,$f9,$f8,$62,$f9,$f8,$62,$e2// 5 bacon
-.byte  $62,$79,$62,$79,$62,$79,$62,$79,$62// 6 guacamole
-.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 7 ketchup/cucumber
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 8 salad
-.byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 9 top bun
+.byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 0  plate
+.byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69// 1  bottom bun
+.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 2  vegan patty
+.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 3  beef patty
+.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 4  cheese
+.byte  $e0,$62,$62,$79,$78,$62,$62,$78,$79// 5  chili cheese
+.byte  $e2,$f8,$f9,$f8,$62,$f9,$f8,$62,$e2// 6  bacon
+.byte  $62,$79,$62,$79,$62,$79,$62,$79,$62// 7  guacamole
+.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 8  ketchup/cucumber
+.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 9  salad
+.byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 10 top bun
 
 
 burgerColors:
-.byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 0 plate
-.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 1 bottom bun
-.byte  $09,$05,$09,$05,$09,$05,$09,$05,$09// 2 vegan patty
-.byte  $09,$09,$09,$09,$09,$09,$09,$09,$09// 3 beef patty
-.byte  $07,$07,$07,$07,$07,$07,$07,$07,$07// 4 cheese
-.byte  $0a,$02,$09,$02,$01,$09,$0a,$02,$09// 5 bacon
-.byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d// 6 guacamole
-.byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 7 ketchup/cucumber
-.byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 8 salad
-.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 9 top bun
+.byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 0  plate
+.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 1  bottom bun
+.byte  $09,$05,$09,$05,$09,$05,$09,$05,$09// 2  vegan patty
+.byte  $09,$09,$09,$09,$09,$09,$09,$09,$09// 3  beef patty
+.byte  $07,$07,$07,$07,$07,$07,$07,$07,$07// 4  cheese
+.byte  $07,$05,$05,$07,$07,$05,$05,$07,$07// 5  chili cheese
+.byte  $0a,$02,$09,$02,$01,$09,$0a,$02,$09// 6  bacon
+.byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d// 7  guacamole
+.byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 8  ketchup/cucumber
+.byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 9  salad
+.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 10 top bun
 
-
+burgerIngredientNames:
+.text "PLATE"
+.text "BOTTOM BUN"
+.text "VEGAN PATTY"
+.text "BEEF PATTY"
+.text "CHEESE"
+.text "CHILI CHEESE"
+.text "BACON"
+.text "GUACAMOLE"
+.text "KETCHUP/CUCUMBER"
+.text "SALAD"
+.text "TOP BUN"
 
 character1:
 .text "CHARLY CHEESE"
@@ -241,7 +259,7 @@ random6:
 random7:
  RandomIngredientTable(7)
 seed:
-  .byte %11001010
+  .byte 0
 // {SPACE}=FIRE,{[Z]or[.]=LEFT],{[X][/]=RIGHT}
 //      SPACE     Z         .        X         /
 keyRowMatrix:
@@ -262,7 +280,7 @@ restart:
 
 init:
 //init screen colors
- 
+  jsr initSeed
   lda #$00
   sta FC_COLOR
   sta BG_COLOR
@@ -389,6 +407,16 @@ set:
   sta CONTROLLER1
   rts  
 
+initSeed:
+  lda #$ff
+  sta $d40e
+  sta $d40f
+  lda #$80
+  sta $d412
+  lda $d41b
+  sta seed
+  rts
+
 setRandomIngredient:
   lda seed
   beq doEor
@@ -399,22 +427,18 @@ doEor:
   eor #$1d
 noEor:  
   sta seed
-  jmp ingredientFound
   tax
   lda burgerIngredientsCount
   cmp #$05
   bne six
-  txa
   lda random5,x
   jmp ingredientFound
 six:  
   cmp #$06
   bne seven
-  txa
   lda random6,x
   jmp ingredientFound
 seven:
-  txa
   lda random7,x
 ingredientFound:  
   sta burgerRandomIngredient
@@ -423,60 +447,61 @@ ingredientFound:
 showBurgerVariants:
   lda #$01
   sta $a4
-  lda #00 // hamburger
+  //lda #00 // hamburger
   ldx #00 
   ldy #13
-  sta burgerStyleSelected
+  //sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$02
   sta $a4
-  lda #00 // cheeseburger
+  //lda #00 // cheeseburger
   ldx #10 
   ldy #13
-  sta burgerStyleSelected
+  //sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$03
   sta $a4
-  lda #00 // bacon chesse burger
+  //lda #00 // bacon chesse burger
   ldx #21 
   ldy #13
-  sta burgerStyleSelected
+  //sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$04
   sta $a4
-  lda #00 // vegan burger
+  //lda #00 // vegan burger
   ldx #31 
   ldy #13
-  sta burgerStyleSelected
+  //sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$05
   sta $a4
-  lda #00 // hamburger
+  //lda #00 // hamburger
   ldx #00 
   ldy #24
-  sta burgerStyleSelected
+  //sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$06
   sta $a4
-  lda #01 // cheeseburger
+  //lda #01 // cheeseburger
   ldx #10 
   ldy #24
-  sta burgerStyleSelected
+  //sta burgerStyleSelected
   jsr displayCompleteBurger
   lda #$07
   sta $a4
-  lda #01 // bacon chesse burger
+  //lda #01 // bacon chesse burger
   ldx #21 
   ldy #24
-  sta burgerStyleSelected
+  //sta burgerStyleSelected
   jsr displayCompleteBurger
-  /*
-  lda #03 //; vegan burger
+  lda #$08
+  sta $a4
+  //lda #03 //; vegan burger
   ldx #31 
   ldy #24
-  sta burgerStyleSelected
+  //sta burgerStyleSelected
   jsr displayCompleteBurger
-  */
+  
   rts
   
 displayCompleteBurger:
@@ -549,7 +574,6 @@ ingredientIndex:
 drawIngredient:
   tya
   pha
-  
   lda #$00
   ldx ingredientIndex
 calculateIngredientOffset:
@@ -560,7 +584,6 @@ calculateIngredientOffset:
   jmp calculateIngredientOffset
 calculateIngredientOffsetExit:
   tax
-  
   ldy #$00
 drawIngredientLoop:
   lda burgerChars,x
@@ -585,8 +608,6 @@ drawIngredientLoop:
   lda $f8
   sbc #$00
   sta $f8
-  
-  
   pla
   tay
   rts
@@ -598,17 +619,19 @@ showMainScreen:
   
 runGame:
 loop:
-  jsr readController
-  jsr logControllers
-  jsr showBurgerVariants
+ // jsr readController
+  //jsr logControllers
+   jsr showBurgerVariants
+ // jsr setRandomIngredient
   //jsr logRandomIngredient
 
   //jmp loop
   rts
 
 logRandomIngredient:
-  lda  seed
-  sta  $0400
+  lda burgerRandomIngredient
+  adc #48
+  sta $0400
   rts
   
 logControllers:
