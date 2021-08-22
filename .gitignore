@@ -1,0 +1,6 @@
+### SKIP BINARIES
+bin/
+*.txt
+### VS Code ###
+.vscode/
+
