@@ -1,5 +1,5 @@
 .pc = $0801
-
+.encoding "screencode_upper"
 //[G]AMETYPE _________ 0=GAME_SINGLE
 //                     1=GAME_COMPETITION
 //                     2=GAME_DEATHMATCH
@@ -42,9 +42,22 @@
 .const GRAP_FCFS = 0  // First come first serve
 .const GRAP_AWAL = 1  // All win / All loose
 
+.const LEFT  = $1b
+.const RIGHT = $17
+
 .const CONTROLLED_BY_KEYBOARD = 1 
 .const CONTROLLED_BY_JOYSTICK = 0
 
+
+.macro SubFromAdress(address,value){
+  sec
+  lda address
+  sbc #<value
+  sta address
+  lda address+1
+  sbc #>value
+  sta address+1
+}
 .macro PlayerData(character) {
 player:
   .word character4
@@ -69,13 +82,17 @@ playerBurgerOffsets:
 }
 
 :BasicUpstart2(start)
-//;*=$c000
-//jmp start
 
 controllerStates:
-  .byte 0,0,0,0,0,0
+  .byte 0,0,0,0,0
+statesChanged:
+  .byte 0,0,0,0
 canHaveRandomGaps:
   .byte 0
+showBurgerAndIngredientNames:
+  .byte 0
+layerWidth:
+  .byte 26
 gameTypeSelected:
   .byte GAME_SINGLE
 gameTypeList:
@@ -145,6 +162,8 @@ playerGrapFlag:
   .byte 0
 playerPointerList:
   .word player1, player2, player3, player4
+playerNextLayerList:
+  .byte 0,0,0,0
 player1:
  PlayerData(character1)
 player2:
@@ -155,11 +174,13 @@ player4:
  PlayerData(character4)
   
 burgerStyleSelected:
-  .byte 4
+  .byte 0
+burgerStyleSelectedTemporary:
+  .byte 0
 maxBurgerStyles:
   .byte 5
 burgerStylePointerList:
-  .word burgerStyle1, burgerStyle2, burgerStyle3, burgerStyle4, burgerStyle5
+  .word burgerStyle1, burgerStyle2, burgerStyle3, burgerStyle4, burgerStyle5,burgerStyle0
 burgerStyle1: // standard
   .byte 0,1,3,8,9,10,$ff
 burgerStyle2: // cheese
@@ -170,6 +191,8 @@ burgerStyle4: // vegan
   .byte 0,1,2,7,8,9,10,$ff
 burgerStyle5: // double chili
   .byte 0,1,3,4,3,5,10,$ff
+burgerStyle0: // empty
+  .byte 11,11,11,11,11,11,11,11,$ff
 burgerIngredientsCount:
   .byte 0
 burgerRandomIngredient:
@@ -179,9 +202,22 @@ burgerNames:
   .text "     CHEESEBURGER     "
   .text "  BACON CHEESEBURGER  "
   .text "VEGAN GUACAMOLE BURGER"
-  .text "HOT DOUBLE CHILIBURGER"
+  .text "  DOUBLE CHILIBURGER  "
 
-burgerChars: 
+ingredientNames:
+.text " PLATE           "
+.text " BOTTOM BUN      "
+.text " VEGAN PATTY     "
+.text " BEEF PATTY      "
+.text " CHEESE          "
+.text " BACON           "
+.text " GUACAMOLE       "
+.text " KETCHUP/CUCUMBER"
+.text " SALAD           "
+.text " TOP BUN         "
+.text "                 "
+
+burgerLayer: 
 .byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 0  plate
 .byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69// 1  bottom bun
 .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 2  vegan patty
@@ -193,9 +229,9 @@ burgerChars:
 .byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 8  ketchup/cucumber
 .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 9  salad
 .byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 10 top bun
+.byte  $20,$20,$20,$20,$20,$20,$20,$20,$20// 11 empty
 
-
-burgerColors:
+burgerLayerColor:
 .byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 0  plate
 .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 1  bottom bun
 .byte  $09,$05,$09,$05,$09,$05,$09,$05,$09// 2  vegan patty
@@ -207,19 +243,8 @@ burgerColors:
 .byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 8  ketchup/cucumber
 .byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 9  salad
 .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 10 top bun
+.byte  $00,$00,$00,$00,$00,$00,$00,$00,$00// 11 black
 
-burgerIngredientNames:
-.text "PLATE"
-.text "BOTTOM BUN"
-.text "VEGAN PATTY"
-.text "BEEF PATTY"
-.text "CHEESE"
-.text "CHILI CHEESE"
-.text "BACON"
-.text "GUACAMOLE"
-.text "KETCHUP/CUCUMBER"
-.text "SALAD"
-.text "TOP BUN"
 
 character1:
 .text "CHARLY CHEESE"
@@ -359,20 +384,49 @@ skip4:
 readJoysticks:
   lda JOYSTICK_PORT1 // read Port1
   and #$1F
+  cmp CONTROLLER1
+  beq rjStateNotChanged1
   sta CONTROLLER1
+  lda #$01
+  jmp rjSetState1
+rjStateNotChanged1:
+  lda #$00
+rjSetState1:  
+  sta statesChanged
+  
   lda JOYSTICK_PORT2 // read Port2
   and #$1F
+  cmp CONTROLLER2
+  beq rjStateNotChanged2
   sta CONTROLLER2
+  lda #$01
+  jmp rjSetState2
+rjStateNotChanged2:
+  lda #$00
+rjSetState2:  
+  sta statesChanged+1
+
   lda USERPORT_DATA // CIA2 PortB Bit7 = 1
   ora #$80
   sta USERPORT_DATA
   lda USERPORT_DATA // read Port3
   and #$1F
+  cmp CONTROLLER3
+  beq rjStateNotChanged3
   sta CONTROLLER3
+  lda #$01
+  jmp rjSetState3
+rjStateNotChanged3:
+  lda #$00
+rjSetState3:  
+  sta statesChanged+2
+
   lda USERPORT_DATA // CIA2 PortB Bit7 = 0
   and #$7F
   sta USERPORT_DATA
   lda USERPORT_DATA // read Port4
+  cmp CONTROLLER4
+  beq rjStateNotChanged4
   pha // Attention: FIRE for Port4 on Bit5, NOT 4.
   and #$0F
   sta CONTROLLER4
@@ -381,6 +435,12 @@ readJoysticks:
   lsr
   ora CONTROLLER4
   sta CONTROLLER4
+  lda #$01
+  jmp rjSetState4
+rjStateNotChanged4:
+  lda #$00
+rjSetState4:  
+  sta statesChanged+3
   rts 
 
 readKeyboard:
@@ -445,66 +505,51 @@ ingredientFound:
   rts
   
 showBurgerVariants:
-  lda #$01
-  sta $a4
-  //lda #00 // hamburger
-  ldx #00 
-  ldy #13
-  //sta burgerStyleSelected
-  jsr displayCompleteBurger
-  lda #$02
-  sta $a4
-  //lda #00 // cheeseburger
-  ldx #10 
-  ldy #13
-  //sta burgerStyleSelected
-  jsr displayCompleteBurger
-  lda #$03
-  sta $a4
-  //lda #00 // bacon chesse burger
-  ldx #21 
-  ldy #13
-  //sta burgerStyleSelected
-  jsr displayCompleteBurger
-  lda #$04
-  sta $a4
-  //lda #00 // vegan burger
-  ldx #31 
-  ldy #13
-  //sta burgerStyleSelected
-  jsr displayCompleteBurger
+  lda statesChanged
+  cmp #$00
+  beq exitShowBurger
+ 
+  lda burgerStyleSelected
+  sta burgerStyleSelectedTemporary
   lda #$05
+  sta burgerStyleSelected
+  lda #$ff // show empty burger
   sta $a4
-  //lda #00 // hamburger
-  ldx #00 
-  ldy #24
-  //sta burgerStyleSelected
-  jsr displayCompleteBurger
-  lda #$06
+  ldx #01 
+  ldy #10
+  jsr drawCompleteBurger
+  lda burgerStyleSelectedTemporary
+  sta burgerStyleSelected
+  lda #$ff // show complete burger
   sta $a4
-  //lda #01 // cheeseburger
-  ldx #10 
-  ldy #24
-  //sta burgerStyleSelected
-  jsr displayCompleteBurger
-  lda #$07
-  sta $a4
-  //lda #01 // bacon chesse burger
-  ldx #21 
-  ldy #24
-  //sta burgerStyleSelected
-  jsr displayCompleteBurger
-  lda #$08
-  sta $a4
-  //lda #03 //; vegan burger
-  ldx #31 
-  ldy #24
-  //sta burgerStyleSelected
-  jsr displayCompleteBurger
+  ldx #01 
+  ldy #10
+  jsr drawCompleteBurger
+checkSelection:
+  lda CONTROLLER1
+  cmp #RIGHT
+  bne isLeft
   
+  inc burgerStyleSelected
+  lda burgerStyleSelected
+  cmp maxBurgerStyles 
+  bne exitShowBurger
+  lda #00
+  sta burgerStyleSelected
+  jmp exitShowBurger
+isLeft:
+  cmp #LEFT
+  bne exitShowBurger
+  dec burgerStyleSelected 
+  lda burgerStyleSelected 
+  cmp #$00
+  bpl exitShowBurger
+  lda #$04
+  sta burgerStyleSelected
+exitShowBurger:
   rts
   
-displayCompleteBurger:
+drawCompleteBurger:
   txa
   pha
   tya
@@ -560,7 +605,8 @@ exitCalcPlateLoop:
   ldy #$00
 getNextIngredientIndex:  
   lda ($94),y
-  //cmp #$ff
+  cmp #$ff
+  beq burgerCompleteDrawn
   cpy $a4
   beq burgerCompleteDrawn
   sta ingredientIndex
@@ -569,8 +615,10 @@ getNextIngredientIndex:
   jmp getNextIngredientIndex
 burgerCompleteDrawn:
   rts
+
 ingredientIndex:
   .byte 0
+
 drawIngredient:
   tya
   pha
@@ -579,35 +627,23 @@ drawIngredient:
 calculateIngredientOffset:
   beq calculateIngredientOffsetExit
   clc
-  adc #$09
+  adc #09
   dex
   jmp calculateIngredientOffset
 calculateIngredientOffsetExit:
   tax
   ldy #$00
 drawIngredientLoop:
-  lda burgerChars,x
+  lda burgerLayer,x
   sta ($92),y
-  lda burgerColors,x
+  lda burgerLayerColor,x
   sta ($f7),y
   inx
   iny
-  cpy #$09
+  cpy #09  
   bne drawIngredientLoop
-  sec
-  lda $92
-  sbc #$28
-  sta $92
-  lda $93
-  sbc #$00
-  sta $93
-  sec
-  lda $f7
-  sbc #$28
-  sta $f7
-  lda $f8
-  sbc #$00
-  sta $f8
+  SubFromAdress($92,$28)
+  SubFromAdress($f7,$28)
   pla
   tay
   rts
@@ -619,13 +655,13 @@ showMainScreen:
   
 runGame:
 loop:
- // jsr readController
+  jsr readController
   //jsr logControllers
-   jsr showBurgerVariants
- // jsr setRandomIngredient
+  jsr showBurgerVariants
+  //jsr setRandomIngredient
   //jsr logRandomIngredient
 
-  //jmp loop
+  jmp loop
   rts
 
 logRandomIngredient:
