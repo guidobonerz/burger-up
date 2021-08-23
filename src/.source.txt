@@ -179,8 +179,10 @@ burgerStyleSelectedTemporary:
   .byte 0
 maxBurgerStyles:
   .byte 5
+maxBurgerLayers:
+  .byte 8
 burgerList:
-  .word burger1, burger2, burger3, burger4, burger5,burger0
+  .word burger1, burger2, burger3, burger4, burger5, $ffff
 burger1: // standard
   .byte 0,1,3,8,9,10,$ff
 burger2: // cheese
@@ -191,8 +193,7 @@ burger4: // vegan
   .byte 0,1,2,7,8,9,10,$ff
 burger5: // double chili
   .byte 0,1,3,4,3,5,10,$ff
-burger0: // empty
-  .byte 11,11,11,11,11,11,11,11,$ff
+
 burgerIngredientsCount:
   .byte 0
 burgerRandomIngredient:
@@ -231,6 +232,7 @@ burgerLayer:
   .byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 10 top bun
   .byte  $20,$20,$20,$20,$20,$20,$20,$20,$20// 11 empty
 
+  
 burgerLayerColor:
   .byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 0  plate
   .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 1  bottom bun
@@ -243,9 +245,8 @@ burgerLayerColor:
   .byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 8  ketchup/cucumber
   .byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 9  salad
   .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 10 top bun
-  .byte  $00,$00,$00,$00,$00,$00,$00,$00,$00// 11 black
-
-
+  .byte  $00,$00,$00,$00,$00,$00,$00,$00,$00// 11 empty
+  
 character1:
   .text "CHARLY CHEESE"
   .byte 0
@@ -523,16 +524,13 @@ browseBurgerVariants:
   sta burgerStyleSelected
   lda #$ff // show complete burger
   sta $a4
-  ldx #01 
-  ldy #10
+  ldx #00 
+  ldy #09
   jsr drawCompleteBurger
 
-  
-checkSelection:
   lda CONTROLLER1
   cmp #RIGHT
   bne isLeft
-  //inc $d020
   inc burgerStyleSelected
   lda burgerStyleSelected
   cmp maxBurgerStyles 
