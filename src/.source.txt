@@ -49,7 +49,7 @@
 .const CONTROLLED_BY_JOYSTICK = 0
 
 
-.macro SubFromAdress(address,value){
+.macro SubstractFromAdress(address,value){
   sec
   lda address
   sbc #<value
@@ -643,8 +643,8 @@ drawIngredientLoop:
   iny
   cpy #09  
   bne drawIngredientLoop
-  SubFromAdress($92,$28)
-  SubFromAdress($f7,$28)
+  SubstractFromAdress($92,$28)
+  SubstractFromAdress($f7,$28)
   pla
   tay
   rts

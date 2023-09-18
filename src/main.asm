@@ -48,8 +48,31 @@
 .const CONTROLLED_BY_KEYBOARD = 1 
 .const CONTROLLED_BY_JOYSTICK = 0
 
+.const SHOW_CASE_DELAY_TIME = 6
 
-.macro SubFromAdress(address,value){
+.macro SaveCurrentTimerToAddress(address){
+  lda $a2
+  sta address+2
+  lda $a1
+  sta address+1
+  lda $a0
+  sta address
+}
+
+.macro AddToAddress(address,value){
+  clc
+  lda address
+  adc #<value
+  sta address
+  bcc skip
+  lda address+1
+  adc #>value
+  sta address+1
+skip:
+  nop
+}
+
+.macro SubstractFromAddress(address,value){
   sec
   lda address
   sbc #<value
@@ -58,9 +81,9 @@
   sbc #>value
   sta address+1
 }
-.macro PlayerData(character) {
+.macro PlayerData(characterPointer) {
 player:
-  .word character4
+  .word characterPointer
 playerName:
   .byte 20
 playerScore:
@@ -83,8 +106,12 @@ nextLayer:
   .for(var i=0;i<=256;i++) .byte random()*max
 }
 
-:BasicUpstart2(start)
+:BasicUpstart2(go)
+go:
+	jmp start
 
+showCaseDelayStart:
+  .byte 20,0,0
 controllerStates:
   .byte 0,0,0,0,0
 statesChanged:
@@ -105,9 +132,9 @@ gameTypeText:
   .text "  DEATH MATCH  "
   .text "CIRCLE TRAINING"
   .text " DRIVE ME NUTS "
-grapMode:
+takeMode:
   .byte GRAP_FCFS
-grapModeText:
+takeModeText:
   .text "FIRST COME FIRST SERVE"  
   .text "  ALL WIN/ALL LOOSE   "
 highScorePointerList:
@@ -178,11 +205,13 @@ burgerStyleSelected:
 burgerStyleSelectedTemporary:
   .byte 0
 maxBurgerStyles:
-  .byte 5
+  .byte 4
 maxBurgerLayers:
   .byte 8
 burgerList:
   .word burger1, burger2, burger3, burger4, burger5, $ffff
+burgerValue:
+  .byte 50,60,70,60,60
 burger1: // standard
   .byte 0,1,3,8,9,10,$ff
 burger2: // cheese
@@ -297,9 +326,11 @@ keyDirection:
 start:
   //;rts
   jsr init
+  jsr initRasterInterrupt
 restart:
   jsr reset
   jsr showMainScreen
+  jsr initTimer
   jsr runGame
   //jmp restart
   rts
@@ -322,7 +353,36 @@ init:
   lda #$00
   sta CIA1_DATA_DIRB
   rts
-  
+initRasterInterrupt:
+  sei                  
+  lda #%01111111       // switch off interrupt signals from CIA-1
+  sta $DC0D
+
+  and $D011            // clear most significant bit of VIC's raster register
+  sta $D011
+
+  lda $DC0D            // acknowledge pending interrupts from CIA-1
+  lda $DD0D            // acknowledge pending interrupts from CIA-2
+
+  lda #0              // set rasterline where interrupt shall occur
+  sta $D012
+
+  lda #irqServiceRoutine
+  sta $0314
+  lda #>irqServiceRoutine
+  sta $0315
+
+  lda #%00000001       // enable raster interrupt signals from VIC
+  sta $D01A
+
+  cli
+  rts
+
+irqServiceRoutine:
+  dec showCaseDelayStart
+  asl $d019
+  jmp $ea81
+    
 reset:
   rts
 
@@ -511,16 +571,22 @@ browseBurgerVariants:
   cmp #$00
   beq exitShowBurger
   lda burgerStyleSelected
-  //sta burgerStyleSelectedTemporary
-  //lda #$05
-  //sta burgerStyleSelected
-  //lda #$ff // show empty burger
-  //sta $a4
-  //ldx #01 
-  //ldy #10
-  //jsr drawCompleteBurger
+  
+  
+  /*
+  sta burgerStyleSelectedTemporary
+  lda #$05
+  sta burgerStyleSelected
+  lda #$ff // show empty burger
+  sta $a4
+  ldx #01 
+  ldy #10
+  jsr drawCompleteBurger
 
-  //lda burgerStyleSelectedTemporary
+  lda burgerStyleSelectedTemporary
+  */
+  
+  
   sta burgerStyleSelected
   lda #$ff // show complete burger
   sta $a4
@@ -566,7 +632,7 @@ drawCompleteBurger:
   sta $95
   ldy #$00
 getNextIngredient:
-  lda ($94),y
+  lda ($94),y 
   cmp #$ff
   beq burgerSizeFound
   iny
@@ -643,8 +709,8 @@ drawIngredientLoop:
   iny
   cpy #09  
   bne drawIngredientLoop
-  SubFromAdress($92,$28)
-  SubFromAdress($f7,$28)
+  SubstractFromAddress($92,$28)
+  SubstractFromAddress($f7,$28)
   pla
   tay
   rts
@@ -653,22 +719,82 @@ drawIngredientLoop:
   
 showMainScreen:
   rts
+
+initTimer:
+ //SaveCurrentTimerToAddress(showCaseDelayStart)
+ //AddToAddress(showCaseDelayStart,30)
+ lda #4
+ sta burgerStyleSelected
   
 runGame:
 loop:
-  jsr readController
+  //jsr readController
   //jsr logControllers
-  jsr browseBurgerVariants
+  //jsr browseBurgerVariants
+  
+	
+  jsr burgerShowCase
+ 
+  
   //jsr setRandomIngredient
   //jsr logRandomIngredient
+  //jsr logTimer
 
   jmp loop
+end:
   rts
 
+burgerShowCase:
+
+  lda showCaseDelayStart
+  bne burgerShowCase
+  lda #SHOW_CASE_DELAY_TIME
+  sta showCaseDelayStart
+  
+  lda #$ff // show complete burger
+  sta $a4
+  ldx #00 
+  ldy #09
+  jsr drawCompleteBurger
+  lda #$ff // show complete burger
+  sta $a4
+  ldx #20 
+  ldy #09
+  jsr drawCompleteBurger
+  lda #$ff // show complete burger
+  sta $a4
+  ldx #00 
+  ldy #20
+  jsr drawCompleteBurger
+  lda #$ff // show complete burger
+  sta $a4
+  ldx #20 
+  ldy #20
+  jsr drawCompleteBurger
+  dec burgerStyleSelected
+  bpl loop
+  lda #4
+  sta burgerStyleSelected
+  lda #SHOW_CASE_DELAY_TIME
+  sta showCaseDelayStart
+  jmp burgerShowCase
+  
 logRandomIngredient:
   lda burgerRandomIngredient
   adc #48
   sta $0400
+  rts
+  
+logTimer:
+  lda $a0
+  
+  sta $0400
+  lda $a1
+  
+  sta $0402
+  lda $a2
+  
+  sta $0404
   rts
   
 logControllers:
