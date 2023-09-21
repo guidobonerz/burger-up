@@ -49,7 +49,7 @@
 .const CONTROLLED_BY_JOYSTICK = 0
 
 
-.macro SubFromAdress(address,value){
+.macro SubstractFromAdress(address,value){
   sec
   lda address
   sbc #<value
@@ -75,6 +75,8 @@ playerIngredientCount:
   .byte 0,0,0,0
 playerBurgerOffsets:
   .word 0,0,0,0
+nextLayer:
+  .byte 1
 }
 
 .macro RandomIngredientTable(max){
@@ -162,8 +164,6 @@ playerGrapFlag:
   .byte 0
 playerPointerList:
   .word player1, player2, player3, player4
-playerNextLayerList:
-  .byte 0,0,0,0
 player1:
  PlayerData(character1)
 player2:
@@ -179,20 +179,21 @@ burgerStyleSelectedTemporary:
   .byte 0
 maxBurgerStyles:
   .byte 5
-burgerStylePointerList:
-  .word burgerStyle1, burgerStyle2, burgerStyle3, burgerStyle4, burgerStyle5,burgerStyle0
-burgerStyle1: // standard
+maxBurgerLayers:
+  .byte 8
+burgerList:
+  .word burger1, burger2, burger3, burger4, burger5, $ffff
+burger1: // standard
   .byte 0,1,3,8,9,10,$ff
-burgerStyle2: // cheese
+burger2: // cheese
   .byte 0,1,3,4,8,9,10,$ff
-burgerStyle3: // bacon
+burger3: // bacon
   .byte 0,1,3,4,6,8,9,10,$ff
-burgerStyle4: // vegan
+burger4: // vegan
   .byte 0,1,2,7,8,9,10,$ff
-burgerStyle5: // double chili
+burger5: // double chili
   .byte 0,1,3,4,3,5,10,$ff
-burgerStyle0: // empty
-  .byte 11,11,11,11,11,11,11,11,$ff
+
 burgerIngredientsCount:
   .byte 0
 burgerRandomIngredient:
@@ -205,94 +206,94 @@ burgerNames:
   .text "  DOUBLE CHILIBURGER  "
 
 ingredientNames:
-.text " PLATE           "
-.text " BOTTOM BUN      "
-.text " VEGAN PATTY     "
-.text " BEEF PATTY      "
-.text " CHEESE          "
-.text " BACON           "
-.text " GUACAMOLE       "
-.text " KETCHUP/CUCUMBER"
-.text " SALAD           "
-.text " TOP BUN         "
-.text "                 "
+  .text " PLATE           "
+  .text " BOTTOM BUN      "
+  .text " VEGAN PATTY     "
+  .text " BEEF PATTY      "
+  .text " CHEESE          "
+  .text " BACON           "
+  .text " GUACAMOLE       "
+  .text " KETCHUP/CUCUMBER"
+  .text " SALAD           "
+  .text " TOP BUN         "
+  .text "                 "
 
 burgerLayer: 
-.byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 0  plate
-.byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69// 1  bottom bun
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 2  vegan patty
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 3  beef patty
-.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 4  cheese
-.byte  $e0,$62,$62,$79,$78,$62,$62,$78,$79// 5  chili cheese
-.byte  $e2,$f8,$f9,$f8,$62,$f9,$f8,$62,$e2// 6  bacon
-.byte  $62,$79,$62,$79,$62,$79,$62,$79,$62// 7  guacamole
-.byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 8  ketchup/cucumber
-.byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 9  salad
-.byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 10 top bun
-.byte  $20,$20,$20,$20,$20,$20,$20,$20,$20// 11 empty
+  .byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 0  plate
+  .byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69// 1  bottom bun
+  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 2  vegan patty
+  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 3  beef patty
+  .byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 4  cheese
+  .byte  $e0,$62,$62,$79,$78,$62,$62,$78,$79// 5  chili cheese
+  .byte  $e2,$f8,$f9,$f8,$62,$f9,$f8,$62,$e2// 6  bacon
+  .byte  $62,$79,$62,$79,$62,$79,$62,$79,$62// 7  guacamole
+  .byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 8  ketchup/cucumber
+  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 9  salad
+  .byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 10 top bun
+  .byte  $20,$20,$20,$20,$20,$20,$20,$20,$20// 11 empty
 
+  
 burgerLayerColor:
-.byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 0  plate
-.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 1  bottom bun
-.byte  $09,$05,$09,$05,$09,$05,$09,$05,$09// 2  vegan patty
-.byte  $09,$09,$09,$09,$09,$09,$09,$09,$09// 3  beef patty
-.byte  $07,$07,$07,$07,$07,$07,$07,$07,$07// 4  cheese
-.byte  $07,$05,$05,$07,$07,$05,$05,$07,$07// 5  chili cheese
-.byte  $0a,$02,$09,$02,$01,$09,$0a,$02,$09// 6  bacon
-.byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d// 7  guacamole
-.byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 8  ketchup/cucumber
-.byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 9  salad
-.byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 10 top bun
-.byte  $00,$00,$00,$00,$00,$00,$00,$00,$00// 11 black
-
-
+  .byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 0  plate
+  .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 1  bottom bun
+  .byte  $09,$05,$09,$05,$09,$05,$09,$05,$09// 2  vegan patty
+  .byte  $09,$09,$09,$09,$09,$09,$09,$09,$09// 3  beef patty
+  .byte  $07,$07,$07,$07,$07,$07,$07,$07,$07// 4  cheese
+  .byte  $07,$05,$05,$07,$07,$05,$05,$07,$07// 5  chili cheese
+  .byte  $0a,$02,$09,$02,$01,$09,$0a,$02,$09// 6  bacon
+  .byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d// 7  guacamole
+  .byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 8  ketchup/cucumber
+  .byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 9  salad
+  .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 10 top bun
+  .byte  $00,$00,$00,$00,$00,$00,$00,$00,$00// 11 empty
+  
 character1:
-.text "CHARLY CHEESE"
-.byte 0
+  .text "CHARLY CHEESE"
+  .byte 0
 character2:
-.text "PATTY PAT    "
-.byte 0
+  .text "PATTY PAT    "
+  .byte 0
 character3:
-.text "BEEF BOB     "
-.byte 0
+  .text "BEEF BOB     "
+  .byte 0
 character4:
-.text "TOMATO TAM   "
-.byte 0
+  .text "TOMATO TAM   "
+  .byte 0
 character5:
-.text "ONION OLLI   "
-.byte 0
+  .text "ONION OLLI   "
+  .byte 0
 character6:
-.text "CRUNCHY CHRIS"
-.byte 0
+  .text "CRUNCHY CHRIS"
+  .byte 0
 character7:
-.text "SALTY SALLY  "
-.byte 0
+  .text "SALTY SALLY  "
+  .byte 0
 character8:
-.text "CHILI CHASE  "
-.byte 0
+  .text "CHILI CHASE  "
+  .byte 0
 character9:
-.text "BACON BENNY  "
-.byte 0
+  .text "BACON BENNY  "
+  .byte 0
 character10:
-.text "VEGAN VIVIAN "
-.byte 0
+  .text "VEGAN VIVIAN "
+  .byte 0
 
 random5:
- RandomIngredientTable(5)
+  RandomIngredientTable(5)
 random6:
- RandomIngredientTable(6)
+  RandomIngredientTable(6)
 random7:
- RandomIngredientTable(7)
+  RandomIngredientTable(7)
 seed:
   .byte 0
 // {SPACE}=FIRE,{[Z]or[.]=LEFT],{[X][/]=RIGHT}
 //      SPACE     Z         .        X         /
 keyRowMatrix:
- .byte %01111111,%11111101,%11011110,%11111011,%10111111,%01111111,%01111111,%11111101,%11111101,0
+  .byte %01111111,%11111101,%11011110,%11111011,%10111111,%01111111,%01111111,%11111101,%11111101,0
 keyColumnMatrix:
- .byte %00010000,%00010000,%10000000,%10000000,%10000000,%00000001,%00001000,%00000001,%00001000
+  .byte %00010000,%00010000,%10000000,%10000000,%10000000,%00000001,%00001000,%00000001,%00001000
 keyDirection:
- .byte %00001111,%00011011,%00011011,%00010111,%00010111
+  .byte %00001111,%00011011,%00011011,%00010111,%00010111
 start:
   //;rts
   jsr init
@@ -504,32 +505,32 @@ ingredientFound:
   sta burgerRandomIngredient
   rts
   
-showBurgerVariants:
+  
+browseBurgerVariants:
   lda statesChanged
   cmp #$00
   beq exitShowBurger
- 
   lda burgerStyleSelected
-  sta burgerStyleSelectedTemporary
-  lda #$05
-  sta burgerStyleSelected
-  lda #$ff // show empty burger
-  sta $a4
-  ldx #01 
-  ldy #10
-  jsr drawCompleteBurger
-  lda burgerStyleSelectedTemporary
+  //sta burgerStyleSelectedTemporary
+  //lda #$05
+  //sta burgerStyleSelected
+  //lda #$ff // show empty burger
+  //sta $a4
+  //ldx #01 
+  //ldy #10
+  //jsr drawCompleteBurger
+
+  //lda burgerStyleSelectedTemporary
   sta burgerStyleSelected
   lda #$ff // show complete burger
   sta $a4
-  ldx #01 
-  ldy #10
+  ldx #00 
+  ldy #09
   jsr drawCompleteBurger
-checkSelection:
+
   lda CONTROLLER1
   cmp #RIGHT
   bne isLeft
-  
   inc burgerStyleSelected
   lda burgerStyleSelected
   cmp maxBurgerStyles 
@@ -558,10 +559,10 @@ drawCompleteBurger:
   txa 
   asl
   tax
-  lda burgerStylePointerList,x
+  lda burgerList,x
   sta $94
   inx
-  lda burgerStylePointerList,x
+  lda burgerList,x
   sta $95
   ldy #$00
 getNextIngredient:
@@ -642,8 +643,8 @@ drawIngredientLoop:
   iny
   cpy #09  
   bne drawIngredientLoop
-  SubFromAdress($92,$28)
-  SubFromAdress($f7,$28)
+  SubstractFromAdress($92,$28)
+  SubstractFromAdress($f7,$28)
   pla
   tay
   rts
@@ -657,7 +658,7 @@ runGame:
 loop:
   jsr readController
   //jsr logControllers
-  jsr showBurgerVariants
+  jsr browseBurgerVariants
   //jsr setRandomIngredient
   //jsr logRandomIngredient
 
