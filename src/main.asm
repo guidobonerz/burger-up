@@ -213,39 +213,42 @@ burgerList:
 burgerValue:
   .byte 50,60,70,60,60
 burger1: // standard
-  .byte 0,1,3,8,9,10,$ff
+  .byte 00,01,03,08,09,10,11,11,$ff
 burger2: // cheese
-  .byte 0,1,3,4,8,9,10,$ff
+  .byte 00,01,03,04,08,09,10,11,$ff
 burger3: // bacon
-  .byte 0,1,3,4,6,8,9,10,$ff
+  .byte 00,01,03,04,06,08,09,10,$ff
 burger4: // vegan
-  .byte 0,1,2,7,8,9,10,$ff
+  .byte 00,01,02,07,08,09,10,11,$ff
 burger5: // double chili
-  .byte 0,1,3,4,3,5,10,$ff
+  .byte 00,01,03,04,03,05,10,11,$ff
 
 burgerIngredientsCount:
   .byte 0
 burgerRandomIngredient:
   .byte 0
 burgerNames:
-  .text "       HAMBURGER      "
-  .text "     CHEESEBURGER     "
-  .text "  BACON CHEESEBURGER  "
-  .text "VEGAN GUACAMOLE BURGER"
-  .text "  DOUBLE CHILIBURGER  "
+  .text "         HAMBURGER         "
+  .text "       CHEESEBURGER        "
+  .text "       CHICKENBURGER       "
+  .text "    BACON CHEESEBURGER     "
+  .text " DOUBLE BACON CHEESEBURGER "
+  .text "  VEGAN GUACAMOLE BURGER   "
+  .text "    DOUBLE CHILIBURGER     "
 
 ingredientNames:
-  .text " PLATE           "
-  .text " BOTTOM BUN      "
-  .text " VEGAN PATTY     "
-  .text " BEEF PATTY      "
-  .text " CHEESE          "
-  .text " BACON           "
-  .text " GUACAMOLE       "
-  .text " KETCHUP/CUCUMBER"
-  .text " SALAD           "
-  .text " TOP BUN         "
-  .text "                 "
+  .text " PLATE            "
+  .text " BOTTOM BUN       "
+  .text " VEGAN PATTY      "
+  .text " BEEF PATTY       "
+  .text " CHEESE           "
+  .text " CHILI CHEESE     "
+  .text " BACON            "
+  .text " GUACAMOLE        "
+  .text " KETCHUP/CUCUMBER "
+  .text " SALAD            "
+  .text " TOP BUN          "
+  .text "                  "
 
 burgerLayer: 
   .byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 0  plate
