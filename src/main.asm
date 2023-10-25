@@ -213,15 +213,15 @@ burgerList:
 burgerValue:
   .byte 50,60,70,60,60
 burger1: // standard
-  .byte 00,01,03,08,09,10,11,11,$ff
+  .byte 01,02,06,09,10,11,00,00,$ff
 burger2: // cheese
-  .byte 00,01,03,04,08,09,10,11,$ff
+  .byte 01,02,04,05,09,10,11,00,$ff
 burger3: // bacon
-  .byte 00,01,03,04,06,08,09,10,$ff
+  .byte 01,02,04,05,07,09,10,11,$ff
 burger4: // vegan
-  .byte 00,01,02,07,08,09,10,11,$ff
+  .byte 01,02,03,08,09,10,11,00,$ff
 burger5: // double chili
-  .byte 00,01,03,04,03,05,10,11,$ff
+  .byte 01,02,04,05,04,06,11,00,$ff
 
 burgerIngredientsCount:
   .byte 0
@@ -237,6 +237,7 @@ burgerNames:
   .text "    DOUBLE CHILIBURGER     "
 
 ingredientNames:
+  .text "                  "
   .text " PLATE            "
   .text " BOTTOM BUN       "
   .text " VEGAN PATTY      "
@@ -248,37 +249,36 @@ ingredientNames:
   .text " KETCHUP/CUCUMBER "
   .text " SALAD            "
   .text " TOP BUN          "
-  .text "                  "
-
+  
 burgerLayer: 
-  .byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 0  plate
-  .byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69// 1  bottom bun
-  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 2  vegan patty
-  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 3  beef patty
-  .byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 4  cheese
-  .byte  $e0,$62,$62,$79,$78,$62,$62,$78,$79// 5  chili cheese
-  .byte  $e2,$f8,$f9,$f8,$62,$f9,$f8,$62,$e2// 6  bacon
-  .byte  $62,$79,$62,$79,$62,$79,$62,$79,$62// 7  guacamole
-  .byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 8  ketchup/cucumber
-  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 9  salad
-  .byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 10 top bun
-  .byte  $20,$20,$20,$20,$20,$20,$20,$20,$20// 11 empty
-
+  .byte  $20,$20,$20,$20,$20,$20,$20,$20,$20// 0  empty  
+  .byte  $77,$e2,$e2,$e2,$e2,$e2,$e2,$e2,$77// 1  plate
+  .byte  $5f,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$69// 2  bottom bun
+  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 3  vegan patty
+  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 4  beef patty
+  .byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 5  cheese
+  .byte  $e0,$62,$62,$79,$78,$62,$62,$78,$79// 6  chili cheese
+  .byte  $e2,$f8,$f9,$f8,$62,$f9,$f8,$62,$e2// 7  bacon
+  .byte  $62,$79,$62,$79,$62,$79,$62,$79,$62// 8  guacamole
+  .byte  $62,$62,$62,$62,$62,$62,$62,$62,$62// 9  ketchup/cucumber
+  .byte  $66,$66,$66,$66,$66,$66,$66,$66,$66// 10 salad
+  .byte  $e9,$a7,$a7,$a7,$a7,$a7,$a7,$a7,$df// 11 top bun
+  
   
 burgerLayerColor:
-  .byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 0  plate
-  .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 1  bottom bun
-  .byte  $09,$05,$09,$05,$09,$05,$09,$05,$09// 2  vegan patty
-  .byte  $09,$09,$09,$09,$09,$09,$09,$09,$09// 3  beef patty
-  .byte  $07,$07,$07,$07,$07,$07,$07,$07,$07// 4  cheese
-  .byte  $07,$05,$05,$07,$07,$05,$05,$07,$07// 5  chili cheese
-  .byte  $0a,$02,$09,$02,$01,$09,$0a,$02,$09// 6  bacon
-  .byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d// 7  guacamole
-  .byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 8  ketchup/cucumber
-  .byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 9  salad
-  .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 10 top bun
-  .byte  $00,$00,$00,$00,$00,$00,$00,$00,$00// 11 empty
-  
+  .byte  $00,$00,$00,$00,$00,$00,$00,$00,$00// 0  empty
+  .byte  $01,$01,$01,$01,$01,$01,$01,$01,$01// 1  plate
+  .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 2  bottom bun
+  .byte  $09,$05,$09,$05,$09,$05,$09,$05,$09// 3  vegan patty
+  .byte  $09,$09,$09,$09,$09,$09,$09,$09,$09// 4  beef patty
+  .byte  $07,$07,$07,$07,$07,$07,$07,$07,$07// 5  cheese
+  .byte  $07,$05,$05,$07,$07,$05,$05,$07,$07// 6  chili cheese
+  .byte  $0a,$02,$09,$02,$01,$09,$0a,$02,$09// 7  bacon
+  .byte  $0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d,$0d// 8  guacamole
+  .byte  $02,$0a,$02,$0a,$0d,$05,$0d,$05,$0d// 9  ketchup/cucumber
+  .byte  $05,$0d,$05,$0d,$05,$0d,$05,$0d,$05// 10 salad
+  .byte  $08,$08,$08,$08,$08,$08,$08,$08,$08// 11 top bun
+    
 character1:
   .text "CHARLY CHEESE"
   .byte 0
