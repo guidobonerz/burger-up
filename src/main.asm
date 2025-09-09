@@ -231,15 +231,15 @@ burgerList:
 burgerValue:
   .byte 50,60,70,60,60
 burger1: // standard
-  .byte 01,02,06,09,10,11,00,00,$ff
+  .byte 01,02,04,09,10,11,00,00,$ff
 burger2: // cheese
   .byte 01,02,04,05,09,10,11,00,$ff
 burger3: // bacon
   .byte 01,02,04,05,07,09,10,11,$ff
 burger4: // vegan
   .byte 01,02,03,08,09,10,11,00,$ff
-burger5: // double chili
-  .byte 01,02,04,05,04,06,11,00,$ff
+burger5: // double chili cheese
+  .byte 01,02,04,06,04,09,11,00,$ff
 
 burgerIngredientsCount:
   .byte 0
