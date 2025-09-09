@@ -105,6 +105,15 @@ gameTypeText:
   .text "  DEATH MATCH  "
   .text "CIRCLE TRAINING"
   .text " DRIVE ME NUTS "
+gameSpeedCurrent:
+  .byte 0
+gameSpeedMax:
+  .byte 3
+gameSpeed:
+  .text " BEGINNER "
+  .text "  NOVICE  "
+  .text " ADVANCED "
+  .text "   NERD   "
 grapMode:
   .byte GRAP_FCFS
 grapModeText:

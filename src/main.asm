@@ -48,7 +48,7 @@
 .const CONTROLLED_BY_KEYBOARD = 1 
 .const CONTROLLED_BY_JOYSTICK = 0
 
-.const SHOW_CASE_DELAY_TIME = 6
+.const SHOW_CASE_DELAY_TIME = 20
 
 .macro SaveCurrentTimerToAddress(address){
   lda $a2
@@ -57,6 +57,15 @@
   sta address+1
   lda $a0
   sta address
+}
+
+// layerNo ff means all layers else index
+.macro drawBurgerAt(layerNo,x,y){
+  lda #layerNo 
+  sta $a4
+  ldx #x 
+  ldy #y
+  jsr drawBurger
 }
 
 .macro AddToAddress(address,value){
@@ -132,6 +141,15 @@ gameTypeText:
   .text "  DEATH MATCH  "
   .text "CIRCLE TRAINING"
   .text " DRIVE ME NUTS "
+ gameSpeedCurrent:
+  .byte 0
+gameSpeedMax:
+  .byte 3
+gameSpeedText:
+  .text "   NUB   "
+  .text "  SOLID  "
+  .text " SKILLED "
+  .text " GODLIKE "
 takeMode:
   .byte GRAP_FCFS
 takeModeText:
@@ -213,15 +231,15 @@ burgerList:
 burgerValue:
   .byte 50,60,70,60,60
 burger1: // standard
-  .byte 01,02,06,09,10,11,00,00,$ff
+  .byte 01,02,04,09,10,11,00,00,$ff
 burger2: // cheese
   .byte 01,02,04,05,09,10,11,00,$ff
 burger3: // bacon
   .byte 01,02,04,05,07,09,10,11,$ff
 burger4: // vegan
   .byte 01,02,03,08,09,10,11,00,$ff
-burger5: // double chili
-  .byte 01,02,04,05,04,06,11,00,$ff
+burger5: // double chili cheese
+  .byte 01,02,04,06,04,09,11,00,$ff
 
 burgerIngredientsCount:
   .byte 0
@@ -584,18 +602,14 @@ browseBurgerVariants:
   sta $a4
   ldx #01 
   ldy #10
-  jsr drawCompleteBurger
+  jsr drawBurger
 
   lda burgerStyleSelectedTemporary
   */
   
   
   sta burgerStyleSelected
-  lda #$ff // show complete burger
-  sta $a4
-  ldx #00 
-  ldy #09
-  jsr drawCompleteBurger
+  drawBurgerAt($ff,0,9)
 
   lda CONTROLLER1
   cmp #RIGHT
@@ -619,7 +633,7 @@ isLeft:
 exitShowBurger:
   rts
   
-drawCompleteBurger:
+drawBurger:
   txa
   pha
   tya
@@ -754,26 +768,12 @@ burgerShowCase:
   lda #SHOW_CASE_DELAY_TIME
   sta showCaseDelayStart
   
-  lda #$ff // show complete burger
-  sta $a4
-  ldx #00 
-  ldy #09
-  jsr drawCompleteBurger
-  lda #$ff // show complete burger
-  sta $a4
-  ldx #20 
-  ldy #09
-  jsr drawCompleteBurger
-  lda #$ff // show complete burger
-  sta $a4
-  ldx #00 
-  ldy #20
-  jsr drawCompleteBurger
-  lda #$ff // show complete burger
-  sta $a4
-  ldx #20 
-  ldy #20
-  jsr drawCompleteBurger
+  drawBurgerAt($ff,0,9)
+  drawBurgerAt($ff,20,9)
+  drawBurgerAt($ff,0,20)
+  drawBurgerAt($ff,20,20)
+  
+
   dec burgerStyleSelected
   bpl loop
   lda #4
