@@ -1,0 +1,41 @@
+################################################################################
+# BUILD FILE
+# generated file: DO NOT EDIT!
+################################################################################
+
+ninja_required_version = 1.3
+toolkit = kick
+machine = 
+format = prg
+basedir = c$:\Users\guido\git\burger-up
+builddir = c$:\Users\guido\git\burger-up\build
+
+project = burger-up
+config = c$:\Users\guido\git\burger-up\project-config.json
+target = c$:\Users\guido\git\burger-up\build\burger-up.prg
+dbg_out = c$:\Users\guido\git\burger-up\build\burger-up.dbg
+python_exe = c$:\Users\guido\.vscode\extensions\rosc.vs64-2.6.2\resources\python\python.exe
+java_exe = java
+rc_exe = c$:\Users\guido\.vscode\extensions\rosc.vs64-2.6.2\tools\rc.py
+rc_flags = --format kick --config "$config"
+build_flags = 
+asm_exe = C$:\Users\guido\applications\KickAss\KickAss.jar
+asminfo = c$:\Users\guido\git\burger-up\build\burger-up.info
+
+flags = -debugdump -asminfo "files|errors" -debug
+includes = -libdir c$:\Users\guido\git\burger-up -libdir c$:\Users\guido\git\burger-up\build
+defs = -define DEBUG -define __kick__ -define DEBUG
+
+rule res
+    command = $python_exe $rc_exe $rc_flags -o $out $in
+
+rule asm
+    depfile = $out.d
+    deps = gcc
+    command = $java_exe -jar $asm_exe -odir "$builddir" -asminfofile "$asminfo" $flags $includes -o $out $in
+
+
+build $target | $dbg_out : asm c$:\Users\guido\git\burger-up\src\main.asm | 
+
+build all: phony $target
+default all
